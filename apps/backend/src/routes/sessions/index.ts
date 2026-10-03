@@ -1,6 +1,6 @@
 import { type FastifyPluginAsync } from "fastify";
 
-const sessionsRoot: FastifyPluginAsync = async (fastify, _opts) => {
+const sessionsRoute: FastifyPluginAsync = async (fastify, _opts) => {
   fastify.get("/", async function (_request, _reply) {
     return [];
   });
@@ -28,4 +28,4 @@ const sessionsRoot: FastifyPluginAsync = async (fastify, _opts) => {
   });
 };
 
-export default sessionsRoot;
+export default sessionsRoute;
