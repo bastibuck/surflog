@@ -1,0 +1,6 @@
+{
+  "name": "shared",
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}
