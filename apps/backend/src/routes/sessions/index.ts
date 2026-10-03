@@ -9,13 +9,21 @@ const sessionsRoot: FastifyPluginAsync = async (fastify, _opts) => {
     return reply.status(201).send({ message: "Session created" });
   });
 
-  fastify.get("/:sessionId", function (request, _reply) {
+  fastify.get<{
+    Params: {
+      sessionId: string;
+    };
+  }>("/:sessionId", function (request, _reply) {
     return {
-      id: (request.params as any).sessionId,
+      id: request.params.sessionId,
     };
   });
 
-  fastify.delete("/:sessionId", function (_request, reply) {
+  fastify.delete<{
+    Params: {
+      sessionId: string;
+    };
+  }>("/:sessionId", function (request, reply) {
     return reply.status(204).send();
   });
 };
