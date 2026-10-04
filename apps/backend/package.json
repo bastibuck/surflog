@@ -2,20 +2,23 @@
   "name": "backend",
   "type": "module",
   "scripts": {
-    "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test \"test/**/*.ts\"",
+    "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test \"test/**/*.test.ts\"",
     "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
     "start": "pnpm run build && fastify start -l info dist/app.js",
-    "build": "pnpm run clean && tsc",
+    "build": "pnpm --filter @surflog/shared build && pnpm run clean && tsc",
     "watch": "tsc -w",
-    "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm run watch\" \"pnpm run dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js"
+    "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"Shared,TypeScript,App\" -c \"green.bold,yellow.bold,cyan.bold\" \"pnpm --filter @surflog/shared run dev:watch\" \"pnpm run watch\" \"pnpm run dev:start\"",
+    "dev:start": "fastify start --ignore-watch=.ts$ --follow-watch=../.. -w -l info -P dist/app.js"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",
     "@fastify/sensible": "^6.0.0",
+    "@surflog/shared": "workspace:*",
     "fastify": "^5.12.5",
     "fastify-cli": "^8.0.3",
-    "fastify-plugin": "^6.0.0"
+    "fastify-plugin": "^6.0.0",
+    "fastify-type-provider-zod": "^7.0.0",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

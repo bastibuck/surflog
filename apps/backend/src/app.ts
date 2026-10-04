@@ -1,8 +1,12 @@
+import type { AutoloadPluginOptions } from "@fastify/autoload";
+import AutoLoad from "@fastify/autoload";
+import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import AutoLoad from "@fastify/autoload";
-import type { AutoloadPluginOptions } from "@fastify/autoload";
-import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
 
 export interface AppOptions
   extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
@@ -16,6 +20,10 @@ const app: FastifyPluginAsync<AppOptions> = async (
   opts,
 ): Promise<void> => {
   // Place here your custom code!
+
+  // setup serializers and validators for zod schemas
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
 
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
