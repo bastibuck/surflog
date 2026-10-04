@@ -19,8 +19,6 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify,
   opts,
 ): Promise<void> => {
-  // Place here your custom code!
-
   // setup serializers and validators for zod schemas
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
@@ -36,6 +34,12 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // This loads all plugins defined in routes
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "routes"),
+    options: opts,
+  });
+
+  // This loads all plugins defined in modules
+  void fastify.register(AutoLoad, {
+    dir: join(appDirectory, "modules"),
     options: opts,
   });
 };

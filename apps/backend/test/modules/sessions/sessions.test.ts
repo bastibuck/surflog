@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 import { test } from "node:test";
-import { build } from "../helper.ts";
+import { build } from "../../helper.ts";
 
 test("/sessions returns all sessions", async (t) => {
   const app = await build(t);
