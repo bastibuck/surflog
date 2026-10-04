@@ -1,6 +1,23 @@
 {
-  "name": "shared",
+  "name": "@surflog/shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
+    "build": "pnpm run clean && tsc -p tsconfig.json",
+    "dev": "pnpm run build && pnpm run dev:watch",
+    "dev:watch": "tsc -p tsconfig.json --watch"
+  },
   "devDependencies": {
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "zod": "catalog:"
   }
 }

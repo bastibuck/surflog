@@ -1,8 +1,12 @@
+import type { AutoloadPluginOptions } from "@fastify/autoload";
+import AutoLoad from "@fastify/autoload";
+import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import AutoLoad from "@fastify/autoload";
-import type { AutoloadPluginOptions } from "@fastify/autoload";
-import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
 
 export interface AppOptions
   extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
@@ -15,24 +19,27 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify,
   opts,
 ): Promise<void> => {
-  // Place here your custom code!
-
-  // Do not touch the following lines
+  // setup serializers and validators for zod schemas
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
 
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
-  // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "plugins"),
     options: opts,
   });
 
   // This loads all plugins defined in routes
-  // define your routes in one of these
-  // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "routes"),
+    options: opts,
+  });
+
+  // This loads all plugins defined in modules
+  void fastify.register(AutoLoad, {
+    dir: join(appDirectory, "modules"),
     options: opts,
   });
 };
