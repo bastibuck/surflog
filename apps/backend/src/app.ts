@@ -8,6 +8,8 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import envPlugin from "./plugins/_/env.ts";
+
 export interface AppOptions
   extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
 const appDirectory = dirname(fileURLToPath(import.meta.url));
@@ -23,12 +25,16 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
 
+  // manually setup environment plugin to load env variables from .env.local file BEFORE other plugins
+  fastify.register(envPlugin);
+
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "plugins"),
     options: opts,
+    ignorePattern: /_\/*/i,
   });
 
   // This loads all plugins defined in routes
