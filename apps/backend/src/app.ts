@@ -1,6 +1,5 @@
 import type { AutoloadPluginOptions } from "@fastify/autoload";
 import AutoLoad from "@fastify/autoload";
-import fastifyEnv from "@fastify/env";
 import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
 import {
   serializerCompiler,
@@ -8,7 +7,8 @@ import {
 } from "fastify-type-provider-zod";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import z from "zod";
+
+import envPlugin from "./plugins/_/env.ts";
 
 export interface AppOptions
   extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
@@ -17,32 +17,16 @@ const appDirectory = dirname(fileURLToPath(import.meta.url));
 // Pass --options via CLI arguments in command to enable these options.
 const options: AppOptions = {};
 
-const EnvSchema = z.object({
-  DATABASE_URL: z.string(),
-});
-
-declare module "fastify" {
-  interface FastifyInstance {
-    env: z.infer<typeof EnvSchema>;
-  }
-}
-
 const app: FastifyPluginAsync<AppOptions> = async (
   fastify,
   opts,
 ): Promise<void> => {
-  // Load environment variables from .env.local file
-  await fastify.register(fastifyEnv, {
-    dotenv: {
-      path: "./.env.local",
-    },
-    confKey: "env",
-    schema: EnvSchema.toJSONSchema({ target: "draft-07" }),
-  });
-
   // setup serializers and validators for zod schemas
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
+
+  // manually setup environment plugin to load env variables from .env.local file BEFORE other plugins
+  fastify.register(envPlugin);
 
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
@@ -50,6 +34,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "plugins"),
     options: opts,
+    ignorePattern: /_\/*/i,
   });
 
   // This loads all plugins defined in routes
