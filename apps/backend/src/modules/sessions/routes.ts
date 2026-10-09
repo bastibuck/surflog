@@ -17,8 +17,8 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         },
       },
     },
-    async function (_request, _reply) {
-      return [];
+    function (_request, _reply) {
+      return fastify.sessionsRepository.list();
     },
   );
 

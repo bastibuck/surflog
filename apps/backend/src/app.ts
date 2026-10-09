@@ -9,9 +9,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import envPlugin from "./plugins/_/env.ts";
+import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
 
 export interface AppOptions
-  extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
+  extends
+    FastifyServerOptions,
+    Partial<AutoloadPluginOptions>,
+    SessionsPluginOptions {}
+
 const appDirectory = dirname(fileURLToPath(import.meta.url));
 
 // Pass --options via CLI arguments in command to enable these options.

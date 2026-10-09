@@ -2,18 +2,36 @@ import * as assert from "node:assert";
 import { test } from "node:test";
 import { build } from "../../helper.ts";
 
+const fakeSessionsRepository = {
+  list: async () => [
+    { id: "779f163e-52e5-496d-8c48-9ecee8e6d780", name: "Fake session" },
+    { id: "b196c283-b88b-4d01-a82a-8322a0d55bb8", name: "Another session" },
+  ],
+  details: async (id: string) => ({
+    id,
+    name: "Session Name",
+  }),
+};
+
 test("/sessions returns all sessions", async (t) => {
-  const app = await build(t);
+  const app = await build(t, {
+    sessionsRepository: fakeSessionsRepository,
+  });
 
   const res = await app.inject({
     url: "/sessions",
   });
 
-  assert.deepEqual(JSON.parse(res.payload), []);
+  assert.deepEqual(JSON.parse(res.payload), [
+    { id: "779f163e-52e5-496d-8c48-9ecee8e6d780", name: "Fake session" },
+    { id: "b196c283-b88b-4d01-a82a-8322a0d55bb8", name: "Another session" },
+  ]);
 });
 
 test("/sessions/:sessionId returns session details", async (t) => {
-  const app = await build(t);
+  const app = await build(t, {
+    sessionsRepository: fakeSessionsRepository,
+  });
 
   const res = await app.inject({
     url: "/sessions/19ef6310-4306-4942-b72a-8f118ccfee38",

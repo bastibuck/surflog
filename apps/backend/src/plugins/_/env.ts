@@ -11,6 +11,7 @@ declare module "fastify" {
     env: z.infer<typeof EnvSchema>;
   }
 }
+
 export default fp(async function envPlugin(fastify, _options) {
   // Load environment variables from .env.local file
   await fastify.register(fastifyEnv, {
