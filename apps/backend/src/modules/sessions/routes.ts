@@ -22,18 +22,6 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
   );
 
-  fastify.post(
-    "/",
-    {
-      schema: {
-        body: CreateSessionPayloadSchema,
-      },
-    },
-    async function (_request, reply) {
-      return reply.status(204).send();
-    },
-  );
-
   fastify.get(
     "/:sessionId",
     {
@@ -46,11 +34,30 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         }),
       },
     },
-    function (request, _reply) {
-      return {
-        id: request.params.sessionId,
-        name: "Session Name",
-      };
+    async function (request, reply) {
+      const session = await fastify.sessionsRepository.findById(
+        request.params.sessionId,
+      );
+
+      if (!session) {
+        throw reply.notFound("Session not found").send();
+      }
+
+      return session;
+    },
+  );
+
+  fastify.post(
+    "/",
+    {
+      schema: {
+        body: CreateSessionPayloadSchema,
+      },
+    },
+    async function (request, reply) {
+      await fastify.sessionsRepository.create(request.body);
+
+      return reply.status(204).send();
     },
   );
 
@@ -63,7 +70,9 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         }),
       },
     },
-    function (request, reply) {
+    async function (request, reply) {
+      await fastify.sessionsRepository.delete(request.params.sessionId);
+
       return reply.status(204).send();
     },
   );

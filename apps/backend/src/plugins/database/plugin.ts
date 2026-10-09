@@ -12,6 +12,9 @@ export default fp(function databasePlugin(fastify, options, done) {
     const db = drizzle(fastify.env.DATABASE_URL);
 
     fastify.decorate("db", db);
+    fastify.addHook("onClose", async () => {
+      await db.$client.end();
+    });
   }
 
   done();

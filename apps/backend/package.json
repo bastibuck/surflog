@@ -11,13 +11,17 @@
     "dev:start": "fastify start --ignore-watch=.ts$ --follow-watch=../.. -w -l info -P dist/app.js",
     "db:start": "(supabase status >/dev/null 2>&1 || supabase start)",
     "db:stop": "supabase stop",
-    "db:reset": "supabase db reset"
+    "db:reset": "supabase db reset",
+    "db:migration:generate": "drizzle-kit generate",
+    "db:migration:migrate": "drizzle-kit migrate",
+    "db:migration:push": "drizzle-kit push"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",
     "@fastify/env": "^7.0.0",
     "@fastify/sensible": "^6.0.0",
     "@surflog/shared": "workspace:*",
+    "dotenv": "^18.0.6",
     "drizzle-orm": "1.0.0-rc.4",
     "fastify": "^5.12.5",
     "fastify-cli": "^8.0.3",

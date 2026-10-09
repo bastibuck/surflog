@@ -1,17 +1,20 @@
 import * as assert from "node:assert";
 import { test } from "node:test";
 import { build } from "../../helper.ts";
+import type { SessionsRepository } from "../../../src/modules/sessions/repository.ts";
 
 const fakeSessionsRepository = {
   list: async () => [
     { id: "779f163e-52e5-496d-8c48-9ecee8e6d780", name: "Fake session" },
     { id: "b196c283-b88b-4d01-a82a-8322a0d55bb8", name: "Another session" },
   ],
-  details: async (id: string) => ({
+  findById: async (id: string) => ({
     id,
     name: "Session Name",
   }),
-};
+  create: async (_session) => {},
+  delete: async (_id) => {},
+} satisfies SessionsRepository;
 
 test("/sessions returns all sessions", async (t) => {
   const app = await build(t, {
@@ -44,7 +47,9 @@ test("/sessions/:sessionId returns session details", async (t) => {
 });
 
 test("/sessions POST creates a new session", async (t) => {
-  const app = await build(t);
+  const app = await build(t, {
+    sessionsRepository: fakeSessionsRepository,
+  });
 
   const res = await app.inject({
     method: "POST",
@@ -58,7 +63,9 @@ test("/sessions POST creates a new session", async (t) => {
 });
 
 test("/sessions POST validates request payload for required fields", async (t) => {
-  const app = await build(t);
+  const app = await build(t, {
+    sessionsRepository: fakeSessionsRepository,
+  });
 
   const res = await app.inject({
     method: "POST",
@@ -74,7 +81,9 @@ test("/sessions POST validates request payload for required fields", async (t) =
 });
 
 test("/sessions POST validates name for max length", async (t) => {
-  const app = await build(t);
+  const app = await build(t, {
+    sessionsRepository: fakeSessionsRepository,
+  });
 
   const res = await app.inject({
     method: "POST",
@@ -92,7 +101,9 @@ test("/sessions POST validates name for max length", async (t) => {
 });
 
 test("/sessions/:sessionId DELETE deletes a session", async (t) => {
-  const app = await build(t);
+  const app = await build(t, {
+    sessionsRepository: fakeSessionsRepository,
+  });
 
   const res = await app.inject({
     method: "DELETE",

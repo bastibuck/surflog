@@ -1,9 +1,9 @@
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { sessionsTable } from "./models/Session.ts";
+import { eq } from "drizzle-orm/pg-core/expressions";
+import type { InferInsertModel } from "drizzle-orm";
 
-export interface SessionsRepository {
-  list: () => Promise<any[]>;
-  details: (id: string) => Promise<any>;
-}
+export type SessionsRepository = ReturnType<typeof createSessionsRepository>;
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -11,28 +11,26 @@ declare module "fastify" {
   }
 }
 
-const createSessionsRepository = (
-  _db: PostgresJsDatabase,
-): SessionsRepository => {
+const createSessionsRepository = (db: PostgresJsDatabase) => {
   return {
-    list: async () => {
-      const sessions = [
-        {
-          id: "98c0dc2a-89cd-473b-bd79-f6a845a835d0",
-          name: "Real session",
-        },
-      ] as any[];
+    list: async () => await db.select().from(sessionsTable),
 
-      return sessions;
+    findById: async (id: string) => {
+      const [session] = await db
+        .select()
+        .from(sessionsTable)
+        .where(eq(sessionsTable.id, id))
+        .limit(1);
+
+      return session ?? null;
     },
 
-    details: async (_id: string) => {
-      const session = {
-        id: "98c0dc2a-89cd-473b-bd79-f6a845a835d0",
-        name: "Real session",
-      } as any;
+    create: async (session: InferInsertModel<typeof sessionsTable>) => {
+      await db.insert(sessionsTable).values({ name: session.name });
+    },
 
-      return session;
+    delete: async (id: string) => {
+      await db.delete(sessionsTable).where(eq(sessionsTable.id, id));
     },
   };
 };
