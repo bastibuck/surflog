@@ -14,7 +14,7 @@
     "db:reset": "supabase db reset",
     "db:migration:generate": "drizzle-kit generate",
     "db:migration:migrate": "drizzle-kit migrate",
-    "db:migration:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",

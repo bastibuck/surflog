@@ -17,8 +17,14 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         },
       },
     },
-    function (_request, _reply) {
-      return fastify.sessionsRepository.list();
+    async function (request, reply) {
+      const result = await fastify.sessionsRepository.list();
+
+      if (result.success === false) {
+        throw reply.internalServerError("Failed to retrieve sessions").send();
+      }
+
+      return result.data;
     },
   );
 
@@ -35,15 +41,19 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      const session = await fastify.sessionsRepository.findById(
+      const result = await fastify.sessionsRepository.findById(
         request.params.sessionId,
       );
 
-      if (!session) {
+      if (result.success === false && result.error === "NOT_FOUND") {
         throw reply.notFound("Session not found").send();
       }
 
-      return session;
+      if (result.success === false) {
+        throw reply.internalServerError("Failed to retrieve session").send();
+      }
+
+      return result.data;
     },
   );
 
@@ -55,7 +65,13 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      await fastify.sessionsRepository.create(request.body);
+      const result = await fastify.sessionsRepository.create(request.body);
+
+      if (result.success === false && result.error === "DUPLICATE_ENTRY") {
+        throw reply
+          .conflict("Session with the same name on that day already exists")
+          .send();
+      }
 
       return reply.status(204).send();
     },

@@ -33,13 +33,11 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // manually setup environment plugin to load env variables from .env.local file BEFORE other plugins
   fastify.register(envPlugin);
 
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
+  // This loads all general plugins defined in plugins
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "plugins"),
     options: opts,
-    ignorePattern: /_\/*/i,
+    ignorePattern: /_\/*/i, // manually load plugins that start with _ in their own order, e.g. envPlugin
   });
 
   // This loads all plugins defined in routes

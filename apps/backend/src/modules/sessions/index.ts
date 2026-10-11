@@ -9,6 +9,12 @@ export type SessionsPluginOptions = {
   sessionsRepository?: SessionsRepository;
 };
 
+declare module "fastify" {
+  interface FastifyInstance {
+    sessionsRepository: SessionsRepository;
+  }
+}
+
 const sessionsPlugin: FastifyPluginAsync<SessionsPluginOptions> = async (
   fastify,
   options,
