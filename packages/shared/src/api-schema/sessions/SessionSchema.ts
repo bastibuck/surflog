@@ -3,6 +3,7 @@ import { z } from "zod";
 const SessionBaseSchema = z.object({
   id: z.uuid(),
   name: z.string().max(50).nonempty(),
+  date: z.coerce.date(),
 });
 
 const SessionDetailsResponseSchema = SessionBaseSchema;
