@@ -1,7 +1,13 @@
 import { integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { brandsTable } from "./Brand.model.ts";
 
 export const sailsTable = pgTable("sails", {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  brand: varchar({ length: 50 }), // TODO: relation?!
   size: integer().notNull(),
+  alias: varchar({ length: 30 }),
+
+  // relations
+  brandId: uuid("brand_id")
+    .notNull()
+    .references(() => brandsTable.id),
 });
