@@ -5,7 +5,7 @@
     "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test \"test/**/*.test.ts\"",
     "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
     "start": "pnpm run build && fastify start -l info dist/app.js",
-    "build": "pnpm --filter @surflog/shared build && pnpm run clean && tsc",
+    "build": "pnpm --filter @surflog/shared build && pnpm run clean && tsc && pnpm run openapi:generate",
     "watch": "tsc -w",
     "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"Shared,TypeScript,App\" -c \"green.bold,yellow.bold,cyan.bold\" \"pnpm --filter @surflog/shared run dev:watch\" \"pnpm run watch\" \"pnpm run dev:start\"",
     "dev:start": "fastify start --ignore-watch=.ts$ --follow-watch=../.. -w -l info -P dist/app.js",
@@ -15,7 +15,7 @@
     "db:migration:generate": "drizzle-kit generate",
     "db:migration:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "openapi:generate": "pnpm run build && node src/scripts/openapi.ts"
+    "openapi:generate": "pnpm run build && node src/scripts/openapi.ts && pnpm dlx openapi-typescript ./contract/openapi.json -o ../../packages/shared/src/api-schema/openapi.ts && pnpm --filter @surflog/shared build"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",

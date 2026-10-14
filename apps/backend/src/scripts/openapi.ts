@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import app from "../app.ts";
@@ -7,21 +7,17 @@ import app from "../app.ts";
 const fastify = Fastify({ logger: false });
 
 try {
-  fastify.register(app);
-
+  await app(fastify, {});
   await fastify.ready();
 
-  const response = await fastify.inject("/docs/json");
-  if (response.statusCode !== 200) {
-    throw new Error(
-      `Failed to generate OpenAPI document: ${response.statusCode}`,
-    );
-  }
+  const contractDirectory = resolve(process.cwd(), "./contract");
+  const openapiPath = resolve(contractDirectory, "openapi.json");
+  const document = fastify.swagger();
 
-  const output = resolve(process.cwd(), "../../openapi.json");
-  await writeFile(output, `${JSON.stringify(response.json(), null, 2)}\n`);
+  await mkdir(contractDirectory, { recursive: true });
+  await writeFile(openapiPath, `${JSON.stringify(document, null, 2)}\n`);
 
-  console.log(`OpenAPI document written to ${output}`);
+  console.log(`OpenAPI document written to ${openapiPath}`);
 } finally {
   await fastify.close();
 }

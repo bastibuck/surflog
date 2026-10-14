@@ -1,11 +1,10 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
-import { z } from "zod";
-
 import {
   CreateSessionPayloadSchema,
-  SessionDetailsResponseSchema,
-  SessionListResponseSchema,
+  GetSessionResponseSchema,
+  GetSessionsListResponseSchema,
 } from "@surflog/shared/api-schema/sessions/SessionSchema";
+import { z } from "zod";
 
 const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -14,7 +13,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["sessions"],
         response: {
-          200: SessionListResponseSchema,
+          200: GetSessionsListResponseSchema,
         },
       },
     },
@@ -35,7 +34,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["sessions"],
         response: {
-          200: SessionDetailsResponseSchema,
+          200: GetSessionResponseSchema,
         },
         params: z.object({
           sessionId: z.uuid(),

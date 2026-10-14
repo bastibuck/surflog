@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// TODO: replace with fastify.swagger() and build openAPI specs to consume by FE
 const SessionBaseSchema = z.object({
   id: z.uuid(),
   name: z.string().max(50).nonempty(),
@@ -8,10 +7,10 @@ const SessionBaseSchema = z.object({
   rating: z.number().int().min(1).max(10),
 });
 
-const SessionDetailsResponseSchema = SessionBaseSchema;
-const SessionListResponseSchema = z.array(SessionDetailsResponseSchema);
+const GetSessionsListResponseSchema = SessionBaseSchema.array();
+const GetSessionResponseSchema = SessionBaseSchema;
 
-const CreateSessionPayloadSchema = SessionDetailsResponseSchema.omit({
+const CreateSessionPayloadSchema = SessionBaseSchema.omit({
   id: true,
 }).extend({
   spotId: z.uuid(),
@@ -19,7 +18,7 @@ const CreateSessionPayloadSchema = SessionDetailsResponseSchema.omit({
 });
 
 export {
-  SessionDetailsResponseSchema,
-  SessionListResponseSchema,
+  GetSessionsListResponseSchema,
+  GetSessionResponseSchema,
   CreateSessionPayloadSchema,
 };
