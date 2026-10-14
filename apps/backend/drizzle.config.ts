@@ -5,9 +5,10 @@ dotenv.config({ path: "./.env.local" });
 
 export default defineConfig({
   out: "./src/plugins/database/drizzle",
-  schema: ["./src/modules/sessions/models"],
+  schema: ["./src/modules/**/*.model.ts"],
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
+  schemaFilter: ["public"],
 });

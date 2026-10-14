@@ -1,41 +1,54 @@
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { sessionsTable } from "./models/Session.ts";
-import { eq } from "drizzle-orm/pg-core/expressions";
 import { type InferInsertModel } from "drizzle-orm";
-import { executeDbCommand, executeDbQuery } from "../../lib/database.ts";
-import type { Repository } from "../../lib/types/Repository.ts";
-import { failure } from "../../lib/typed-result.ts";
+import { eq } from "drizzle-orm/pg-core/expressions";
+import type { FastifyInstance } from "fastify";
 
-const createSessionsRepository = (db: PostgresJsDatabase) => {
+import { executeDbCommand, executeDbQuery } from "../../lib/database.ts";
+import { failure } from "../../lib/typed-result.ts";
+import type { Repository } from "../../lib/types/Repository.ts";
+import { sessionsTable } from "./models/Session.model.ts";
+
+const createSessionsRepository = (db: FastifyInstance["db"]) => {
   return {
-    list: () => executeDbQuery(db.select().from(sessionsTable)),
+    list: () =>
+      executeDbQuery(
+        db.query.sessions.findMany({
+          columns: {
+            id: true,
+            name: true,
+            date: true,
+            rating: true,
+          },
+        }),
+      ),
 
     findById: async (id: string) => {
       const result = await executeDbQuery(
-        db
-          .select()
-          .from(sessionsTable)
-          .where(eq(sessionsTable.id, id))
-          .limit(1),
+        db.query.sessions.findFirst({
+          columns: {
+            id: true,
+            name: true,
+            date: true,
+            rating: true,
+          },
+          where: {
+            id: id,
+          },
+        }),
       );
 
       if (result.success === false) {
         return result;
       }
 
-      if (result.data.length === 0) {
+      if (result.data === undefined) {
         return failure("NOT_FOUND" as const);
       }
 
-      return { success: true, data: result.data[0] };
+      return result;
     },
 
     create: (session: InferInsertModel<typeof sessionsTable>) => {
-      return executeDbCommand(
-        db
-          .insert(sessionsTable)
-          .values({ name: session.name, date: session.date }),
-      );
+      return executeDbCommand(db.insert(sessionsTable).values(session));
     },
 
     delete: (id: string) => {

@@ -11,11 +11,13 @@ const fakeSessionsRepository = {
         id: "779f163e-52e5-496d-8c48-9ecee8e6d780",
         name: "Fake session",
         date: "2024-06-01",
+        rating: 2,
       },
       {
         id: "b196c283-b88b-4d01-a82a-8322a0d55bb8",
         name: "Another session",
         date: "2024-06-02",
+        rating: 5,
       },
     ]),
   findById: async (id: string) =>
@@ -23,6 +25,7 @@ const fakeSessionsRepository = {
       id,
       name: "Session Name",
       date: "2024-06-03",
+      rating: 1,
     }),
   create: async (_session) => success(undefined),
   delete: async (_id) => success(undefined),
@@ -42,11 +45,13 @@ test("/sessions returns all sessions", async (t) => {
       id: "779f163e-52e5-496d-8c48-9ecee8e6d780",
       name: "Fake session",
       date: "2024-06-01",
+      rating: 2,
     },
     {
       id: "b196c283-b88b-4d01-a82a-8322a0d55bb8",
       name: "Another session",
       date: "2024-06-02",
+      rating: 5,
     },
   ]);
 });
@@ -64,6 +69,7 @@ test("/sessions/:sessionId returns session details", async (t) => {
     id: "19ef6310-4306-4942-b72a-8f118ccfee38",
     name: "Session Name",
     date: "2024-06-03",
+    rating: 1,
   });
 });
 
@@ -78,6 +84,9 @@ test("/sessions POST creates a new session", async (t) => {
     payload: {
       name: "Test Session",
       date: "2024-06-02",
+      rating: 8,
+      spotId: "e237d317-f452-422e-bf92-aebcdf375cca",
+      sailId: "e237d317-f452-422e-bf92-aebcdf375cca",
     },
   });
 
@@ -92,15 +101,13 @@ test("/sessions POST validates request payload for required fields", async (t) =
   const res = await app.inject({
     method: "POST",
     url: "/sessions",
-    payload: {
-      date: "2024-06-02",
-    },
+    payload: {},
   });
 
   assert.equal(res.statusCode, 400);
   assert.equal(
     JSON.parse(res.payload).message,
-    "body/name Invalid input: expected string, received undefined",
+    "body/name Invalid input: expected string, received undefined, body/date Invalid input: expected string, received undefined, body/rating Invalid input: expected number, received undefined, body/spotId Invalid input: expected string, received undefined, body/sailId Invalid input: expected string, received undefined",
   );
 });
 
@@ -115,6 +122,9 @@ test("/sessions POST validates name for max length", async (t) => {
     payload: {
       name: "a".repeat(51),
       date: "2024-06-02",
+      rating: 1,
+      spotId: "e237d317-f452-422e-bf92-aebcdf375cca",
+      sailId: "e237d317-f452-422e-bf92-aebcdf375cca",
     },
   });
 
