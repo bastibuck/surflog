@@ -1,4 +1,4 @@
-import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import { z } from "zod";
 
 import {
@@ -12,6 +12,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/",
     {
       schema: {
+        tags: ["sessions"],
         response: {
           200: SessionListResponseSchema,
         },
@@ -32,6 +33,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/:sessionId",
     {
       schema: {
+        tags: ["sessions"],
         response: {
           200: SessionDetailsResponseSchema,
         },
@@ -61,6 +63,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/",
     {
       schema: {
+        tags: ["sessions"],
         body: CreateSessionPayloadSchema,
       },
     },
@@ -81,6 +84,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/:sessionId",
     {
       schema: {
+        tags: ["sessions"],
         params: z.object({
           sessionId: z.uuid(),
         }),

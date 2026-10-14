@@ -14,19 +14,22 @@
     "db:reset": "supabase db reset",
     "db:migration:generate": "drizzle-kit generate",
     "db:migration:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "openapi:generate": "pnpm run build && node src/scripts/openapi.ts"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",
     "@fastify/env": "^7.0.0",
     "@fastify/sensible": "^6.0.0",
+    "@fastify/swagger": "^9.9.2",
+    "@fastify/swagger-ui": "^6.1.2",
+    "@fastify/type-provider-zod": "^1.0.1",
     "@surflog/shared": "workspace:*",
     "dotenv": "^18.0.6",
     "drizzle-orm": "1.0.0-rc.4",
     "fastify": "^5.12.5",
     "fastify-cli": "^8.0.3",
     "fastify-plugin": "^6.0.0",
-    "fastify-type-provider-zod": "^7.0.0",
     "postgres": "^3.4.9",
     "supabase": "^2.119.0",
     "zod": "catalog:"

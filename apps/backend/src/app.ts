@@ -4,11 +4,12 @@ import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
 import {
   serializerCompiler,
   validatorCompiler,
-} from "fastify-type-provider-zod";
+} from "@fastify/type-provider-zod";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import envPlugin from "./plugins/_/env.ts";
+import docsPlugin from "./plugins/_/docs.ts";
 import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
 
 export interface AppOptions
@@ -30,8 +31,9 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
 
-  // manually setup environment plugin to load env variables from .env.local file BEFORE other plugins
+  // manually setup plugins that are needed BEFORE other plugins
   fastify.register(envPlugin);
+  fastify.register(docsPlugin);
 
   // This loads all general plugins defined in plugins
   void fastify.register(AutoLoad, {
