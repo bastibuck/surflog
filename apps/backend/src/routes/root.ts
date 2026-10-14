@@ -1,8 +1,8 @@
-import { type FastifyPluginAsync } from "fastify";
+import { type FastifyPluginCallback } from "fastify";
 
-const rootRoute: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
-  fastify.get("/", async function (_request, _reply) {
-    return "Marketing Site for Surflog - The ultimate surf tracking app!";
+const rootRoute: FastifyPluginCallback = (fastify, _opts) => {
+  fastify.get("/", function (_request, _reply) {
+    return { alive: true };
   });
 };
 
