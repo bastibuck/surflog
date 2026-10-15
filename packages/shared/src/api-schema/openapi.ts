@@ -20,12 +20,16 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Default Response */
+                /** @description Health check response */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": {
+                            alive: boolean;
+                        };
+                    };
                 };
             };
         };
@@ -53,7 +57,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Default Response */
+                /** @description List of sessions */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -66,6 +70,7 @@ export interface paths {
                             /** Format: date */
                             date: string;
                             rating: number;
+                            notes?: string;
                         }[];
                     };
                 };
@@ -86,6 +91,7 @@ export interface paths {
                         /** Format: date */
                         date: string;
                         rating: number;
+                        notes?: string;
                         /** Format: uuid */
                         spotId: string;
                         /** Format: uuid */
@@ -94,8 +100,8 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Default Response */
-                200: {
+                /** @description Session created */
+                201: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -127,7 +133,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Default Response */
+                /** @description Session details */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -140,6 +146,7 @@ export interface paths {
                             /** Format: date */
                             date: string;
                             rating: number;
+                            notes?: string;
                         };
                     };
                 };
@@ -158,8 +165,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Default Response */
-                200: {
+                /** @description Session deleted */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };

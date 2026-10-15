@@ -13,7 +13,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["sessions"],
         response: {
-          200: GetSessionsListResponseSchema,
+          200: GetSessionsListResponseSchema.describe("List of sessions"),
         },
       },
     },
@@ -34,7 +34,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["sessions"],
         response: {
-          200: GetSessionResponseSchema,
+          200: GetSessionResponseSchema.describe("Session details"),
         },
         params: z.object({
           sessionId: z.uuid(),
@@ -64,6 +64,9 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["sessions"],
         body: CreateSessionPayloadSchema,
+        response: {
+          201: z.undefined().describe("Session created"),
+        },
       },
     },
     async function (request, reply) {
@@ -75,7 +78,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
           .send();
       }
 
-      return reply.status(204).send();
+      return reply.status(201).send();
     },
   );
 
@@ -87,6 +90,9 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         params: z.object({
           sessionId: z.uuid(),
         }),
+        response: {
+          204: z.undefined().describe("Session deleted"),
+        },
       },
     },
     async function (request, reply) {

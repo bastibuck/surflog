@@ -5,6 +5,7 @@ const SessionBaseSchema = z.object({
   name: z.string().max(50).nonempty(),
   date: z.iso.date(),
   rating: z.number().int().min(1).max(10),
+  notes: z.string().max(500).optional(),
 });
 
 const GetSessionsListResponseSchema = SessionBaseSchema.array();

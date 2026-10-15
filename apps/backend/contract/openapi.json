@@ -10,9 +10,29 @@
   "paths": {
     "/": {
       "get": {
+        "tags": [
+          "system"
+        ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Health check response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alive": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "alive"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Health check response"
+                }
+              }
+            }
           }
         }
       }
@@ -24,7 +44,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "List of sessions",
             "content": {
               "application/json": {
                 "schema": {
@@ -51,6 +71,10 @@
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 10
+                      },
+                      "notes": {
+                        "type": "string",
+                        "maxLength": 500
                       }
                     },
                     "required": [
@@ -60,7 +84,8 @@
                       "rating"
                     ],
                     "additionalProperties": false
-                  }
+                  },
+                  "description": "List of sessions"
                 }
               }
             }
@@ -93,6 +118,10 @@
                     "minimum": 1,
                     "maximum": 10
                   },
+                  "notes": {
+                    "type": "string",
+                    "maxLength": 500
+                  },
                   "spotId": {
                     "type": "string",
                     "format": "uuid",
@@ -116,8 +145,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Default Response"
+          "201": {
+            "description": "Session created"
           }
         }
       }
@@ -141,7 +170,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Session details",
             "content": {
               "application/json": {
                 "schema": {
@@ -166,6 +195,10 @@
                       "type": "integer",
                       "minimum": 1,
                       "maximum": 10
+                    },
+                    "notes": {
+                      "type": "string",
+                      "maxLength": 500
                     }
                   },
                   "required": [
@@ -174,7 +207,8 @@
                     "date",
                     "rating"
                   ],
-                  "additionalProperties": false
+                  "additionalProperties": false,
+                  "description": "Session details"
                 }
               }
             }
@@ -198,8 +232,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Default Response"
+          "204": {
+            "description": "Session deleted"
           }
         }
       }

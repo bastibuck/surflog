@@ -18,6 +18,7 @@ export const sessionsTable = pgTable(
     name: varchar({ length: 50 }).notNull(),
     date: date({ mode: "string" }).notNull(),
     rating: smallint().notNull(),
+    notes: varchar({ length: 500 }),
 
     // relations
     spotId: uuid("spot_id")
