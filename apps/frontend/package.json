@@ -4,6 +4,7 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "@surflog/shared": "workspace:*"
+    "@surflog/shared": "workspace:*",
+    "openapi-fetch": "^0.17.0"
   }
 }

@@ -45,3 +45,6 @@ const relations = defineRelations(schema, (relationBuilder) => ({
 }));
 
 export { schema, relations };
+
+export type Schema = typeof schema;
+export type TableName = keyof Schema;

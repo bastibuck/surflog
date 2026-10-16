@@ -3,7 +3,7 @@ import { brandsTable } from "./Brand.model.ts";
 
 export const sailsTable = pgTable("sails", {
   id: uuid().primaryKey().defaultRandom().notNull(),
-  size: integer().notNull(),
+  size: integer().notNull(), // TODO: enforce positive values
   alias: varchar({ length: 30 }),
 
   // relations

@@ -1,56 +1,44 @@
 import { DrizzleQueryError } from "drizzle-orm/errors";
 import postgres from "postgres";
-import { failure, success, type TypedResult } from "./typed-result.ts";
+import { failure, type TypedResult } from "./typed-result.ts";
+import type { TableName } from "../plugins/database/schema.ts";
 
-// TODO: handle more cases? like
-// | "CONNECTION_FAILED"
-// | "QUERY_FAILED"
-// | "TIMEOUT"
-// | "UNKNOWN_ERROR" ...
-type DatabaseError = "DUPLICATE_ENTRY";
+type DatabaseError =
+  | "DUPLICATE_ENTRY__UNKNOWN"
+  | `DUPLICATE_ENTRY__${TableName}`
+  | `NOT_FOUND__${TableName}`
+  | "NOT_FOUND__UNKNOWN";
 
-/**
- * execute a DB query and return the result, or a DatabaseError on failure
- *
- * @param query the DB query to perform
- * @returns data on success, or a DatabaseError on failure
- */
-const executeDbQuery = async <T>(
-  query: Promise<T>,
-): Promise<TypedResult<T, DatabaseError>> => {
-  try {
-    const data = await query;
+class EntityNotFoundError extends Error {
+  tableName: TableName;
 
-    return success(data);
-  } catch (error) {
-    if (error instanceof DrizzleQueryError) {
-      if (error.cause instanceof postgres.PostgresError) {
-        if (error.cause.code === "23505") {
-          return failure("DUPLICATE_ENTRY");
+  constructor(table: TableName, identifier: string) {
+    super(`${table} > '${identifier}' not found`);
+
+    this.tableName = table;
+  }
+}
+
+const handleDbErrors = (error: unknown): TypedResult<never, DatabaseError> => {
+  if (error instanceof DrizzleQueryError) {
+    if (error.cause instanceof postgres.PostgresError) {
+      if (error.cause.code === "23505") {
+        if (error.cause.table_name) {
+          return failure(
+            `DUPLICATE_ENTRY__${error.cause.table_name as TableName}` as const,
+          );
         }
+
+        return failure("DUPLICATE_ENTRY__UNKNOWN" as const);
       }
     }
-
-    throw error;
-  }
-};
-
-/**
- * triggers a DB command with no return value, such as an insert, update, or delete operation
- *
- * @param query the DB query to perform
- * @returns undefined data on success, or a DatabaseError on failure
- */
-const executeDbCommand = async (
-  query: Promise<unknown>,
-): Promise<TypedResult<void, DatabaseError>> => {
-  const result = await executeDbQuery(query);
-
-  if (!result.success) {
-    return result;
   }
 
-  return success(undefined);
+  if (error instanceof EntityNotFoundError) {
+    return failure(`NOT_FOUND__${error.tableName}` as const);
+  }
+
+  throw error;
 };
 
-export { executeDbQuery, executeDbCommand };
+export { EntityNotFoundError, handleDbErrors };

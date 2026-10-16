@@ -15,7 +15,7 @@
     "db:migration:generate": "drizzle-kit generate",
     "db:migration:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "openapi:generate": "pnpm run build && node src/scripts/openapi.ts && pnpm dlx openapi-typescript ./contract/openapi.json -o ../../packages/shared/src/api-schema/openapi.ts && pnpm --filter @surflog/shared build"
+    "openapi:generate": "node src/scripts/openapi.ts && pnpm dlx openapi-typescript ./contract/openapi.json -o ../../packages/shared/src/api-schema/openapi.ts && pnpm --filter @surflog/shared build"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",

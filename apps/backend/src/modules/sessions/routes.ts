@@ -6,6 +6,10 @@ import {
 } from "@surflog/shared/api-schema/sessions/SessionSchema";
 import { z } from "zod";
 
+// TODOs
+// - [ ] generate named migration
+// - [ ] add tests for the sessions routes and DB
+
 const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/",
@@ -21,7 +25,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const result = await fastify.sessionsRepository.list();
 
       if (result.success === false) {
-        throw reply.internalServerError("Failed to retrieve sessions").send();
+        return reply.internalServerError("Failed to retrieve sessions").send();
       }
 
       return result.data;
@@ -46,12 +50,12 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.params.sessionId,
       );
 
-      if (result.success === false && result.error === "NOT_FOUND") {
-        throw reply.notFound("Session not found").send();
+      if (result.success === false && result.error === "NOT_FOUND__sessions") {
+        return reply.notFound("Session not found");
       }
 
       if (result.success === false) {
-        throw reply.internalServerError("Failed to retrieve session").send();
+        return reply.internalServerError("Failed to retrieve session");
       }
 
       return result.data;
@@ -72,10 +76,50 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async function (request, reply) {
       const result = await fastify.sessionsRepository.create(request.body);
 
-      if (result.success === false && result.error === "DUPLICATE_ENTRY") {
-        throw reply
-          .conflict("Session with the same name on that day already exists")
-          .send();
+      if (result.success === false && result.error === "NOT_FOUND__brands") {
+        return reply.notFound("Brand not found");
+      }
+
+      if (
+        result.success === false &&
+        result.error === "DUPLICATE_ENTRY__brands"
+      ) {
+        return reply.conflict("Brand already exists");
+      }
+
+      if (result.success === false && result.error === "NOT_FOUND__sails") {
+        return reply.notFound("Sail not found");
+      }
+
+      if (
+        result.success === false &&
+        result.error === "DUPLICATE_ENTRY__sails"
+      ) {
+        return reply.conflict("Sail already exists");
+      }
+
+      if (result.success === false && result.error === "NOT_FOUND__spots") {
+        return reply.notFound("Spot not found");
+      }
+
+      if (
+        result.success === false &&
+        result.error === "DUPLICATE_ENTRY__spots"
+      ) {
+        return reply.conflict("Spot already exists");
+      }
+
+      if (
+        result.success === false &&
+        result.error === "DUPLICATE_ENTRY__sessions"
+      ) {
+        return reply.conflict(
+          "Session with the same name on that day already exists",
+        );
+      }
+
+      if (result.success === false) {
+        return reply.internalServerError("Failed to retrieve session");
       }
 
       return reply.status(201).send();

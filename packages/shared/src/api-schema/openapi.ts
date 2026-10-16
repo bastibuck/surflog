@@ -69,8 +69,6 @@ export interface paths {
                             name: string;
                             /** Format: date */
                             date: string;
-                            rating: number;
-                            notes?: string;
                         }[];
                     };
                 };
@@ -91,11 +89,20 @@ export interface paths {
                         /** Format: date */
                         date: string;
                         rating: number;
-                        notes?: string;
-                        /** Format: uuid */
-                        spotId: string;
-                        /** Format: uuid */
-                        sailId: string;
+                        notes: string | null;
+                        spot: {
+                            id: string | null;
+                            name: string;
+                        };
+                        sail: {
+                            id: string | null;
+                            size: number;
+                            alias: string | null;
+                            brand: {
+                                id: string | null;
+                                name: string;
+                            };
+                        };
                     };
                 };
             };
@@ -146,7 +153,15 @@ export interface paths {
                             /** Format: date */
                             date: string;
                             rating: number;
-                            notes?: string;
+                            notes: string | null;
+                            spot: {
+                                name: string;
+                            };
+                            sail: {
+                                size: number;
+                                alias: string | null;
+                                brand: string;
+                            };
                         };
                     };
                 };
