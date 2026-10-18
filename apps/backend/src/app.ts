@@ -4,12 +4,20 @@ import type { FastifyPluginAsync, FastifyServerOptions } from "fastify";
 import {
   serializerCompiler,
   validatorCompiler,
-} from "fastify-type-provider-zod";
+} from "@fastify/type-provider-zod";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import envPlugin from "./plugins/_/env.ts";
+import docsPlugin from "./plugins/_/docs.ts";
+import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
+
 export interface AppOptions
-  extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
+  extends
+    FastifyServerOptions,
+    Partial<AutoloadPluginOptions>,
+    SessionsPluginOptions {}
+
 const appDirectory = dirname(fileURLToPath(import.meta.url));
 
 // Pass --options via CLI arguments in command to enable these options.
@@ -23,12 +31,15 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
 
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
+  // manually setup plugins that are needed BEFORE other plugins
+  fastify.register(envPlugin);
+  fastify.register(docsPlugin);
+
+  // This loads all general plugins defined in plugins
   void fastify.register(AutoLoad, {
     dir: join(appDirectory, "plugins"),
     options: opts,
+    ignorePattern: /_\/*/i, // manually load plugins that start with _ in their own order, e.g. envPlugin
   });
 
   // This loads all plugins defined in routes
