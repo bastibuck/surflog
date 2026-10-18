@@ -1,20 +1,19 @@
 import { eq } from "drizzle-orm/pg-core/expressions";
 import type { FastifyInstance } from "fastify";
 
-import { EntityNotFoundError, handleDbErrors } from "../../lib/database.ts";
-import { success } from "../../lib/typed-result.ts";
-import type { Repository } from "../../lib/types/Repository.ts";
-import { sessionsTable } from "./models/Session.model.ts";
 import type { CreateSessionPayload } from "@surflog/shared/api-schema/sessions/SessionSchema";
+import { EntityNotFoundError, withDatabaseResult } from "../../lib/database.ts";
+import type { Repository } from "../../lib/types/Repository.ts";
 import { brandsTable } from "../gear/models/Brand.model.ts";
 import { sailsTable } from "../gear/models/Sail.model.ts";
 import { spotsTable } from "../spots/models/Spot.model.ts";
+import { sessionsTable } from "./models/Session.model.ts";
 
 const createSessionsRepository = (db: FastifyInstance["db"]) => {
   return {
-    list: async () =>
-      success(
-        await db.query.sessions.findMany({
+    list: () =>
+      withDatabaseResult(() =>
+        db.query.sessions.findMany({
           columns: {
             id: true,
             name: true,
@@ -23,8 +22,8 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
         }),
       ),
 
-    findById: async (id: string) => {
-      try {
+    findById: (id: string) =>
+      withDatabaseResult(async () => {
         const session = await db.query.sessions.findFirst({
           columns: {
             id: true,
@@ -34,7 +33,7 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
             notes: true,
           },
           where: {
-            id: id,
+            id,
           },
           with: {
             spot: {
@@ -62,21 +61,18 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
           throw new EntityNotFoundError("sessions", id);
         }
 
-        return success({
+        return {
           ...session,
           sail: {
             ...session.sail,
             brand: session.sail.brand.name,
           },
-        });
-      } catch (err) {
-        return handleDbErrors(err);
-      }
-    },
+        };
+      }),
 
-    create: async (session: CreateSessionPayload) => {
-      try {
-        await db.transaction(async (tx) => {
+    create: (session: CreateSessionPayload) =>
+      withDatabaseResult(() =>
+        db.transaction(async (tx) => {
           const brandId = await resolveBrandId(tx, session.sail.brand);
           const sailId = await resolveSailId(tx, session.sail, brandId);
           const spotId = await resolveSpotId(tx, session.spot);
@@ -89,23 +85,13 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
             sailId: sailId,
             spotId: spotId,
           });
-        });
+        }),
+      ),
 
-        return success(undefined);
-      } catch (err) {
-        return handleDbErrors(err);
-      }
-    },
-
-    delete: async (id: string) => {
-      try {
-        return success(
-          await db.delete(sessionsTable).where(eq(sessionsTable.id, id)),
-        );
-      } catch (err) {
-        return handleDbErrors(err);
-      }
-    },
+    delete: (id: string) =>
+      withDatabaseResult(async () => {
+        db.delete(sessionsTable).where(eq(sessionsTable.id, id));
+      }),
   } satisfies Repository;
 };
 

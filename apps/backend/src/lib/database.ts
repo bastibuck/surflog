@@ -1,6 +1,6 @@
 import { DrizzleQueryError } from "drizzle-orm/errors";
 import postgres from "postgres";
-import { failure, type TypedResult } from "./typed-result.ts";
+import { failure, success, type TypedResult } from "./typed-result.ts";
 import type { TableName } from "../plugins/database/schema.ts";
 
 type DatabaseError =
@@ -18,6 +18,14 @@ class EntityNotFoundError extends Error {
     this.tableName = table;
   }
 }
+
+const withDatabaseResult = async <T>(operation: () => Promise<T>) => {
+  try {
+    return success(await operation());
+  } catch (error) {
+    return handleDbErrors(error);
+  }
+};
 
 const handleDbErrors = (error: unknown): TypedResult<never, DatabaseError> => {
   if (error instanceof DrizzleQueryError) {
@@ -42,4 +50,4 @@ const handleDbErrors = (error: unknown): TypedResult<never, DatabaseError> => {
   throw error;
 };
 
-export { EntityNotFoundError, handleDbErrors };
+export { EntityNotFoundError, handleDbErrors, withDatabaseResult };

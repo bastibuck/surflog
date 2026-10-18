@@ -6,10 +6,6 @@ import {
 } from "@surflog/shared/api-schema/sessions/SessionSchema";
 import { z } from "zod";
 
-// TODOs
-// - [ ] generate named migration
-// - [ ] add tests for the sessions routes and DB
-
 const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/",

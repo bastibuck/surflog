@@ -26,6 +26,15 @@ const fakeSessionsRepository = {
       name: "Session Name",
       date: "2024-06-03",
       rating: 1,
+      notes: null,
+      spot: {
+        name: "Spot Name",
+      },
+      sail: {
+        size: 5,
+        alias: "Sail Alias",
+        brand: "Some Brand",
+      },
     }),
   create: async (_session) => success(undefined),
   delete: async (_id) => success(undefined),
@@ -45,13 +54,11 @@ test("/sessions returns all sessions", async (t) => {
       id: "779f163e-52e5-496d-8c48-9ecee8e6d780",
       name: "Fake session",
       date: "2024-06-01",
-      rating: 2,
     },
     {
       id: "b196c283-b88b-4d01-a82a-8322a0d55bb8",
       name: "Another session",
       date: "2024-06-02",
-      rating: 5,
     },
   ]);
 });
@@ -70,6 +77,15 @@ test("/sessions/:sessionId returns session details", async (t) => {
     name: "Session Name",
     date: "2024-06-03",
     rating: 1,
+    notes: null,
+    spot: {
+      name: "Spot Name",
+    },
+    sail: {
+      size: 5,
+      alias: "Sail Alias",
+      brand: "Some Brand",
+    },
   });
 });
 
@@ -85,12 +101,24 @@ test("/sessions POST creates a new session", async (t) => {
       name: "Test Session",
       date: "2024-06-02",
       rating: 8,
-      spotId: "e237d317-f452-422e-bf92-aebcdf375cca",
-      sailId: "e237d317-f452-422e-bf92-aebcdf375cca",
+      notes: null,
+      spot: {
+        id: "e237d317-f452-422e-bf92-aebcdf375cca",
+        name: "Spot Name",
+      },
+      sail: {
+        id: "e237d317-f452-422e-bf92-aebcdf375cca",
+        size: 5,
+        alias: "Sail Alias",
+        brand: {
+          id: "e237d317-f452-422e-bf92-aebcdf375cca",
+          name: "Some Brand",
+        },
+      },
     },
   });
 
-  assert.equal(res.statusCode, 204);
+  assert.equal(res.statusCode, 201);
 });
 
 test("/sessions POST validates request payload for required fields", async (t) => {
@@ -107,7 +135,7 @@ test("/sessions POST validates request payload for required fields", async (t) =
   assert.equal(res.statusCode, 400);
   assert.equal(
     JSON.parse(res.payload).message,
-    "body/name Invalid input: expected string, received undefined, body/date Invalid input: expected string, received undefined, body/rating Invalid input: expected number, received undefined, body/spotId Invalid input: expected string, received undefined, body/sailId Invalid input: expected string, received undefined",
+    "body/name Invalid input: expected string, received undefined, body/date Invalid input: expected string, received undefined, body/rating Invalid input: expected number, received undefined, body/notes Invalid input: expected string, received undefined, body/spot Invalid input: expected object, received undefined, body/sail Invalid input: expected object, received undefined",
   );
 });
 
@@ -123,8 +151,20 @@ test("/sessions POST validates name for max length", async (t) => {
       name: "a".repeat(51),
       date: "2024-06-02",
       rating: 1,
-      spotId: "e237d317-f452-422e-bf92-aebcdf375cca",
-      sailId: "e237d317-f452-422e-bf92-aebcdf375cca",
+      notes: null,
+      spot: {
+        id: "e237d317-f452-422e-bf92-aebcdf375cca",
+        name: "Spot Name",
+      },
+      sail: {
+        id: "e237d317-f452-422e-bf92-aebcdf375cca",
+        size: 5,
+        alias: "Sail Alias",
+        brand: {
+          id: "e237d317-f452-422e-bf92-aebcdf375cca",
+          name: "Some Brand",
+        },
+      },
     },
   });
 
