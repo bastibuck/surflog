@@ -10,11 +10,11 @@ try {
   await app(fastify, {});
   await fastify.ready();
 
-  const contractDirectory = resolve(process.cwd(), "./contract");
-  const openapiPath = resolve(contractDirectory, "openapi.json");
+  const generatedDirectory = resolve(process.cwd(), "./generated");
+  const openapiPath = resolve(generatedDirectory, "openapi.json");
   const document = fastify.swagger();
 
-  await mkdir(contractDirectory, { recursive: true });
+  await mkdir(generatedDirectory, { recursive: true });
   await writeFile(openapiPath, `${JSON.stringify(document, null, 2)}\n`);
 
   console.log(`OpenAPI document written to ${openapiPath}`);
