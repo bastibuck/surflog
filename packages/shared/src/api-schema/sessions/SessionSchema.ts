@@ -10,9 +10,9 @@ const SessionBaseSchema = z.object({
     name: z.string().max(50).nonempty(),
   }),
   sail: z.object({
-    size: z.number().int(),
+    size: z.number().int().positive(),
     alias: z.string().max(30).nullable(),
-    brand: z.string().nonempty(),
+    brand: z.string().max(100).nonempty(),
   }),
 });
 
@@ -33,11 +33,11 @@ const CreateSessionPayloadSchema = SessionBaseSchema.omit({
   }),
   sail: z.object({
     id: z.uuid().nullable(),
-    size: z.number().int(),
+    size: z.number().int().positive(),
     alias: z.string().max(30).nullable(),
     brand: z.object({
       id: z.uuid().nullable(),
-      name: z.string().nonempty(),
+      name: z.string().max(100).nonempty(),
     }),
   }),
 });

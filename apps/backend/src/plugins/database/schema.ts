@@ -1,8 +1,8 @@
 import { defineRelations } from "drizzle-orm";
+import { brandsTable } from "../../modules/gear/models/Brand.model.ts";
 import { sailsTable } from "../../modules/gear/models/Sail.model.ts";
 import { sessionsTable } from "../../modules/sessions/models/Session.model.ts";
 import { spotsTable } from "../../modules/spots/models/Spot.model.ts";
-import { brandsTable } from "../../modules/gear/models/Brand.model.ts";
 
 const schema = {
   spots: spotsTable,
@@ -44,7 +44,7 @@ const relations = defineRelations(schema, (relationBuilder) => ({
   },
 }));
 
-export { schema, relations };
+export { relations, schema };
 
 export type Schema = typeof schema;
 export type TableName = keyof Schema;

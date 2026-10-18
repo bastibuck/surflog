@@ -31,6 +31,6 @@ export const sessionsTable = pgTable(
   },
   (t) => [
     unique().on(t.name, t.date),
-    check("rating_check", sql`${t.rating} between 1 and 10`),
+    check("sessions_rating_check", sql`${t.rating} between 1 and 10`),
   ],
 );

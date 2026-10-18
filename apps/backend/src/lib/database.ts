@@ -22,6 +22,7 @@ class EntityNotFoundError extends Error {
 const handleDbErrors = (error: unknown): TypedResult<never, DatabaseError> => {
   if (error instanceof DrizzleQueryError) {
     if (error.cause instanceof postgres.PostgresError) {
+      // DUPLICATION ERROR
       if (error.cause.code === "23505") {
         if (error.cause.table_name) {
           return failure(

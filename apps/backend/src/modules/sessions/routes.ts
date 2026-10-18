@@ -25,7 +25,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const result = await fastify.sessionsRepository.list();
 
       if (result.success === false) {
-        return reply.internalServerError("Failed to retrieve sessions").send();
+        return reply.internalServerError("Failed to retrieve sessions");
       }
 
       return result.data;
@@ -119,7 +119,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       }
 
       if (result.success === false) {
-        return reply.internalServerError("Failed to retrieve session");
+        return reply.internalServerError("Failed to create session");
       }
 
       return reply.status(201).send();
