@@ -8,6 +8,11 @@ const createGearRepository = (db: FastifyInstance["db"]) => {
     listSails: () =>
       withDatabaseResult(async () => {
         const sails = await db.query.sails.findMany({
+          columns: {
+            id: true,
+            size: true,
+            alias: true,
+          },
           with: {
             brand: true,
           },

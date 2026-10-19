@@ -11,12 +11,16 @@ import { fileURLToPath } from "node:url";
 import envPlugin from "./plugins/_/env.ts";
 import docsPlugin from "./plugins/_/docs.ts";
 import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
+import type { GearPluginOptions } from "./modules/gear/index.ts";
+import type { SpotsPluginOptions } from "./modules/spots/index.ts";
 
 export interface AppOptions
   extends
     FastifyServerOptions,
     Partial<AutoloadPluginOptions>,
-    SessionsPluginOptions {}
+    SessionsPluginOptions,
+    GearPluginOptions,
+    SpotsPluginOptions {}
 
 const appDirectory = dirname(fileURLToPath(import.meta.url));
 
