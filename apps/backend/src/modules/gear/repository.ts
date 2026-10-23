@@ -18,13 +18,23 @@ const createGearRepository = (db: FastifyInstance["db"]) => {
           },
         });
 
-        return sails.map((sail) => ({
-          ...sail,
-          brand: sail.brand.name,
-        }));
+        return sails
+          .map((sail) => ({
+            ...sail,
+            brand: sail.brand.name,
+          }))
+          .sort((a, b) => a.brand.localeCompare(b.brand))
+          .sort((a, b) => a.size - b.size);
       }),
 
-    listBrands: () => withDatabaseResult(() => db.query.brands.findMany()),
+    listBrands: () =>
+      withDatabaseResult(() =>
+        db.query.brands.findMany({
+          orderBy: {
+            name: "asc",
+          },
+        }),
+      ),
   } satisfies Repository;
 };
 

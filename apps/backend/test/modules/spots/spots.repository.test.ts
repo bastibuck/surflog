@@ -12,7 +12,7 @@ describe("Module: spots", () => {
         seed: async (db) => {
           await db
             .insert(spotsTable)
-            .values([{ name: "Test Spot 1" }, { name: "Test Spot 2" }]);
+            .values([{ name: "Test Spot 2" }, { name: "Test Spot 1" }]);
         },
 
         reset: async (db) => {

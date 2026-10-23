@@ -7,7 +7,14 @@ import type { CreateSpotPayload } from "@surflog/shared/api-schema/spots/SpotSch
 
 const createSpotsRepository = (db: FastifyInstance["db"]) => {
   return {
-    list: () => withDatabaseResult(() => db.query.spots.findMany()),
+    list: () =>
+      withDatabaseResult(() =>
+        db.query.spots.findMany({
+          orderBy: {
+            name: "asc",
+          },
+        }),
+      ),
 
     create: (spot: CreateSpotPayload) =>
       withDatabaseResult(() =>
