@@ -2,7 +2,7 @@
   "name": "backend",
   "type": "module",
   "scripts": {
-    "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test \"test/**/*.test.ts\"",
+    "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test --test-concurrency=1 \"test/**/*.test.ts\"",
     "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
     "start": "pnpm run build && fastify start -l info dist/app.js",
     "build": "pnpm --filter @surflog/shared build && pnpm run clean && tsc",
