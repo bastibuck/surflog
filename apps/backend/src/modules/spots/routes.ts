@@ -49,7 +49,7 @@ const spotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       }
 
       if (result.success === false) {
-        return reply.internalServerError("Failed to retrieve spots");
+        return reply.internalServerError("Failed to create spot");
       }
 
       return reply.status(201).send();

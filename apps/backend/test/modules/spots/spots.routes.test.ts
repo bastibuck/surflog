@@ -55,6 +55,7 @@ describe("Module: spots", () => {
       });
 
       assert.equal(res.statusCode, 500);
+      assert.equal(JSON.parse(res.payload).message, "Failed to retrieve spots");
     });
 
     test("POST /spots returns 201", async (t) => {
@@ -136,7 +137,7 @@ describe("Module: spots", () => {
       });
 
       assert.equal(res.statusCode, 500);
-      assert.equal(JSON.parse(res.payload).message, "Failed to retrieve spots");
+      assert.equal(JSON.parse(res.payload).message, "Failed to create spot");
     });
 
     test("POST /spots returns 500 on unknown error", async (t) => {
@@ -157,6 +158,7 @@ describe("Module: spots", () => {
       });
 
       assert.equal(res.statusCode, 500);
+      assert.equal(JSON.parse(res.payload).message, "Failed to create spot");
     });
   });
 });
