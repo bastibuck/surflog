@@ -41,6 +41,22 @@ describe("Module: spots", () => {
       ]);
     });
 
+    test("GET /spots returns 500 on unknown error", async (t) => {
+      const app = await build(t, {
+        spotsRepository: {
+          ...fakeSpotsRepository,
+          // @ts-expect-error unsupported return type to simulate unknown error
+          list: async () => failure("UNKNOWN"),
+        },
+      });
+
+      const res = await app.inject({
+        url: "/spots",
+      });
+
+      assert.equal(res.statusCode, 500);
+    });
+
     test("POST /spots returns 201", async (t) => {
       const app = await build(t, {
         spotsRepository: {
@@ -121,6 +137,26 @@ describe("Module: spots", () => {
 
       assert.equal(res.statusCode, 500);
       assert.equal(JSON.parse(res.payload).message, "Failed to retrieve spots");
+    });
+
+    test("POST /spots returns 500 on unknown error", async (t) => {
+      const app = await build(t, {
+        spotsRepository: {
+          ...fakeSpotsRepository,
+          // @ts-expect-error unsupported return type to simulate unknown error
+          create: async () => failure("UNKNOWN"),
+        },
+      });
+
+      const res = await app.inject({
+        url: "/spots",
+        method: "POST",
+        payload: {
+          name: "Fake name",
+        },
+      });
+
+      assert.equal(res.statusCode, 500);
     });
   });
 });
