@@ -3,7 +3,13 @@ import * as test from "node:test";
 import { fileURLToPath } from "node:url";
 import helper from "fastify-cli/helper.js";
 
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./.env.local" });
+
 import type { AppOptions } from "../src/app.ts";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { relations } from "../src/plugins/database/schema.ts";
 
 export type TestContext = {
   after: typeof test.after;
@@ -46,4 +52,38 @@ async function build(t: TestContext, options: AppOptions = {}) {
   return app;
 }
 
-export { config, build };
+const createTestDatabase = () => {
+  return drizzle(process.env.DATABASE_URL!, { relations });
+};
+
+export type TestDB = ReturnType<typeof createTestDatabase>;
+
+type DatabaseTestOptions = {
+  seed?: (db: TestDB) => Promise<void> | void;
+  reset?: (db: TestDB) => Promise<void> | void;
+};
+
+async function buildTestDatabase(
+  t: TestContext,
+  options: DatabaseTestOptions = {},
+): Promise<TestDB> {
+  const db = createTestDatabase();
+
+  const seed = options.seed ?? (async () => {});
+  const reset = options.reset ?? (async () => {});
+
+  t.after(async () => {
+    try {
+      await reset(db);
+    } finally {
+      await db.$client.end();
+    }
+  });
+
+  await reset(db); // reset the database before seeding to ensure a clean state
+  await seed(db);
+
+  return db;
+}
+
+export { config, build, buildTestDatabase };
