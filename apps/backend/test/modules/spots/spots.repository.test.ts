@@ -1,26 +1,28 @@
 import * as assert from "node:assert";
-import { describe, test } from "node:test";
-import { spotsTable } from "../../../src/modules/spots/models/Spot.model.ts";
+import { afterEach, describe, test } from "node:test";
 import { createSpotsRepository } from "../../../src/modules/spots/repository.ts";
 
-import { buildTestDatabase } from "../../helper.ts";
+import { spotsTable } from "../../../src/modules/spots/models/Spot.model.ts";
+import { setupTestDatabase } from "../../helper.ts";
 
 describe("Module: spots", () => {
+  const { getTestDb } = setupTestDatabase();
+
   describe("repository", () => {
-    test("should list all spots correctly", async (t) => {
-      const db = await buildTestDatabase(t, {
-        seed: async (db) => {
-          await db
-            .insert(spotsTable)
-            .values([{ name: "Test Spot 2" }, { name: "Test Spot 1" }]);
-        },
+    afterEach(async () => {
+      const testDb = getTestDb();
 
-        reset: async (db) => {
-          await db.delete(spotsTable);
-        },
-      });
+      await testDb.delete(spotsTable);
+    });
 
-      const repo = createSpotsRepository(db);
+    test("should list all spots correctly", async () => {
+      const testDb = getTestDb();
+
+      await testDb
+        .insert(spotsTable)
+        .values([{ name: "Test Spot 2" }, { name: "Test Spot 1" }]);
+
+      const repo = createSpotsRepository(testDb);
 
       const spots = await repo.list();
 
@@ -30,14 +32,10 @@ describe("Module: spots", () => {
       assert.strictEqual(spots.data[1].name, "Test Spot 2");
     });
 
-    test("should create spot correctly", async (t) => {
-      const db = await buildTestDatabase(t, {
-        reset: async (db) => {
-          await db.delete(spotsTable);
-        },
-      });
+    test("should create spot correctly", async () => {
+      const testDb = getTestDb();
 
-      const repo = createSpotsRepository(db);
+      const repo = createSpotsRepository(testDb);
 
       const initialSpots = await repo.list();
 
@@ -53,17 +51,12 @@ describe("Module: spots", () => {
       assert.strictEqual(spotsAfterCreation.data[0].name, "Test Spot");
     });
 
-    test("should reject duplicate spot creation", async (t) => {
-      const db = await buildTestDatabase(t, {
-        seed: async (db) => {
-          await db.insert(spotsTable).values({ name: "Duplication Test Spot" });
-        },
-        reset: async (db) => {
-          await db.delete(spotsTable);
-        },
-      });
+    test("should reject duplicate spot creation", async () => {
+      const testDb = getTestDb();
 
-      const repo = createSpotsRepository(db);
+      await testDb.insert(spotsTable).values({ name: "Duplication Test Spot" });
+
+      const repo = createSpotsRepository(testDb);
 
       const res = await repo.create({ name: "Duplication Test Spot" });
 

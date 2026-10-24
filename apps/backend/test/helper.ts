@@ -1,22 +1,23 @@
-import { dirname, join } from "node:path";
+import helper from "fastify-cli/helper.js";
+import path from "node:path";
 import * as test from "node:test";
 import { fileURLToPath } from "node:url";
-import helper from "fastify-cli/helper.js";
 
-import dotenv from "dotenv";
-
-dotenv.config({ path: "./.env.local" });
-
-import type { AppOptions } from "../src/app.ts";
+import {
+  PostgreSqlContainer,
+  type StartedPostgreSqlContainer,
+} from "@testcontainers/postgresql";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { readdir, readFile } from "node:fs/promises";
+import type { AppOptions } from "../src/app.ts";
 import { relations } from "../src/plugins/database/schema.ts";
 
 export type TestContext = {
   after: typeof test.after;
 };
 
-const AppPath = join(
-  dirname(fileURLToPath(import.meta.url)),
+const AppPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
   "..",
   "src",
   "app.ts",
@@ -52,38 +53,60 @@ async function build(t: TestContext, options: AppOptions = {}) {
   return app;
 }
 
-const createTestDatabase = () => {
-  return drizzle(process.env.DATABASE_URL!, { relations });
+const createTestDbClient = (connectionUri: string) => {
+  return drizzle(connectionUri, { relations });
 };
 
-export type TestDB = ReturnType<typeof createTestDatabase>;
+function setupTestDatabase() {
+  let postgresContainer: StartedPostgreSqlContainer;
+  let testDb: ReturnType<typeof createTestDbClient>;
 
-type DatabaseTestOptions = {
-  seed?: (db: TestDB) => Promise<void> | void;
-  reset?: (db: TestDB) => Promise<void> | void;
-};
+  test.before(async () => {
+    postgresContainer = await new PostgreSqlContainer(
+      "postgres:latest",
+    ).start();
 
-async function buildTestDatabase(
-  t: TestContext,
-  options: DatabaseTestOptions = {},
-): Promise<TestDB> {
-  const db = createTestDatabase();
+    testDb = createTestDbClient(postgresContainer.getConnectionUri());
 
-  const seed = options.seed ?? (async () => {});
-  const reset = options.reset ?? (async () => {});
+    // setup roles required for migrations to work (this is a manual step because the used supabase DB would need it and set it up automatically)
+    const roles = [
+      "anon",
+      "authenticated",
+      "postgres",
+      "service_role",
+    ] as const;
 
-  t.after(async () => {
-    try {
-      await reset(db);
-    } finally {
-      await db.$client.end();
+    for (const role of roles) {
+      await testDb.execute(`CREATE ROLE ${role}`);
     }
+
+    // apply migrations
+    const migrationDirectory = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "supabase",
+      "migrations",
+    );
+    const migrationFiles = await readdir(migrationDirectory);
+
+    for (const migrationFile of migrationFiles) {
+      const migration = await readFile(
+        path.join(migrationDirectory, migrationFile),
+      );
+      await testDb.execute(migration.toString());
+    }
+
+    return testDb;
   });
 
-  await reset(db); // reset the database before seeding to ensure a clean state
-  await seed(db);
+  test.after(async () => {
+    await testDb.$client.end();
+    await postgresContainer.stop();
+  });
 
-  return db;
+  return {
+    getTestDb: () => testDb,
+  };
 }
 
-export { config, build, buildTestDatabase };
+export { build, config, setupTestDatabase };
