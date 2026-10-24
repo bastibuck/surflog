@@ -1,31 +1,26 @@
+import { asc, eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 
 import { withDatabaseResult } from "../../lib/database.ts";
+import { brandsTable } from "./models/Brand.model.ts";
+import { sailsTable } from "./models/Sail.model.ts";
 import type { Repository } from "../../lib/types/Repository.ts";
 
 const createGearRepository = (db: FastifyInstance["db"]) => {
   return {
     listSails: () =>
-      withDatabaseResult(async () => {
-        const sails = await db.query.sails.findMany({
-          columns: {
-            id: true,
-            size: true,
-            alias: true,
-          },
-          with: {
-            brand: true,
-          },
-        });
-
-        return sails
-          .map((sail) => ({
-            ...sail,
-            brand: sail.brand.name,
-          }))
-          .sort((a, b) => a.brand.localeCompare(b.brand))
-          .sort((a, b) => a.size - b.size);
-      }),
+      withDatabaseResult(() =>
+        db
+          .select({
+            id: sailsTable.id,
+            size: sailsTable.size,
+            alias: sailsTable.alias,
+            brand: brandsTable.name,
+          })
+          .from(sailsTable)
+          .innerJoin(brandsTable, eq(sailsTable.brandId, brandsTable.id))
+          .orderBy(asc(sailsTable.size), asc(brandsTable.name)),
+      ),
 
     listBrands: () =>
       withDatabaseResult(() =>
