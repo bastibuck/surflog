@@ -1,16 +1,23 @@
-import { dirname, join } from "node:path";
+import helper from "fastify-cli/helper.js";
+import path from "node:path";
 import * as test from "node:test";
 import { fileURLToPath } from "node:url";
-import helper from "fastify-cli/helper.js";
 
+import {
+  PostgreSqlContainer,
+  type StartedPostgreSqlContainer,
+} from "@testcontainers/postgresql";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { readdir, readFile } from "node:fs/promises";
 import type { AppOptions } from "../src/app.ts";
+import { relations } from "../src/plugins/database/schema.ts";
 
 export type TestContext = {
   after: typeof test.after;
 };
 
-const AppPath = join(
-  dirname(fileURLToPath(import.meta.url)),
+const AppPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
   "..",
   "src",
   "app.ts",
@@ -46,4 +53,60 @@ async function build(t: TestContext, options: AppOptions = {}) {
   return app;
 }
 
-export { config, build };
+const createTestDbClient = (connectionUri: string) => {
+  return drizzle(connectionUri, { relations });
+};
+
+function setupTestDatabase() {
+  let postgresContainer: StartedPostgreSqlContainer;
+  let testDb: ReturnType<typeof createTestDbClient>;
+
+  test.before(async () => {
+    postgresContainer = await new PostgreSqlContainer(
+      "postgres:latest",
+    ).start();
+
+    testDb = createTestDbClient(postgresContainer.getConnectionUri());
+
+    // setup roles required for migrations to work (this is a manual step because the used supabase DB would need it and set it up automatically)
+    const roles = [
+      "anon",
+      "authenticated",
+      "postgres",
+      "service_role",
+    ] as const;
+
+    for (const role of roles) {
+      await testDb.execute(`CREATE ROLE ${role}`);
+    }
+
+    // apply migrations
+    const migrationDirectory = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "supabase",
+      "migrations",
+    );
+    const migrationFiles = await readdir(migrationDirectory);
+
+    for (const migrationFile of migrationFiles) {
+      const migration = await readFile(
+        path.join(migrationDirectory, migrationFile),
+      );
+      await testDb.execute(migration.toString());
+    }
+
+    return testDb;
+  });
+
+  test.after(async () => {
+    await testDb.$client.end();
+    await postgresContainer.stop();
+  });
+
+  return {
+    getTestDb: () => testDb,
+  };
+}
+
+export { build, config, setupTestDatabase };
