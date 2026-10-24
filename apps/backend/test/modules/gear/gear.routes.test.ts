@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 import { describe, test } from "node:test";
-import { success } from "../../../src/lib/typed-result.ts";
+import { failure, success } from "../../../src/lib/typed-result.ts";
 import type { GearRepository } from "../../../src/modules/gear/repository.ts";
 import { build } from "../../helper.ts";
 
@@ -40,6 +40,42 @@ describe("Module: gear", () => {
           { id: "e1aca720-9c75-40c9-ad8e-c4171f37e21c", name: "Brand 2" },
         ]);
       });
+
+      test("GET /gear/brands returns empty array when no brands exist", async (t) => {
+        const app = await build(t, {
+          gearRepository: {
+            ...fakeGearRepository,
+            listBrands: async () => success([]),
+          },
+        });
+
+        const res = await app.inject({
+          url: "/gear/brands",
+        });
+
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(JSON.parse(res.payload), []);
+      });
+
+      test("GET /gear/brands returns 500 on unknown error", async (t) => {
+        const app = await build(t, {
+          gearRepository: {
+            ...fakeGearRepository,
+            // @ts-expect-error unsupported return type to simulate unknown error
+            listBrands: async () => failure("UNKNOWN"),
+          },
+        });
+
+        const res = await app.inject({
+          url: "/gear/brands",
+        });
+
+        assert.equal(res.statusCode, 500);
+        assert.equal(
+          JSON.parse(res.payload).message,
+          "Failed to retrieve brands",
+        );
+      });
     });
 
     describe("sails", () => {
@@ -72,6 +108,42 @@ describe("Module: gear", () => {
             alias: null,
           },
         ]);
+      });
+
+      test("GET /gear/sails returns empty array when no sails exist", async (t) => {
+        const app = await build(t, {
+          gearRepository: {
+            ...fakeGearRepository,
+            listSails: async () => success([]),
+          },
+        });
+
+        const res = await app.inject({
+          url: "/gear/sails",
+        });
+
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(JSON.parse(res.payload), []);
+      });
+
+      test("GET /gear/sails returns 500 on unknown error", async (t) => {
+        const app = await build(t, {
+          gearRepository: {
+            ...fakeGearRepository,
+            // @ts-expect-error unsupported return type to simulate unknown error
+            listSails: async () => failure("UNKNOWN"),
+          },
+        });
+
+        const res = await app.inject({
+          url: "/gear/sails",
+        });
+
+        assert.equal(res.statusCode, 500);
+        assert.equal(
+          JSON.parse(res.payload).message,
+          "Failed to retrieve sails",
+        );
       });
     });
   });

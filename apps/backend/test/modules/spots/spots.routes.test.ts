@@ -41,6 +41,22 @@ describe("Module: spots", () => {
       ]);
     });
 
+    test("GET /spots returns empty list when no spots exist", async (t) => {
+      const app = await build(t, {
+        spotsRepository: {
+          ...fakeSpotsRepository,
+          list: async () => success([]),
+        },
+      });
+
+      const res = await app.inject({
+        url: "/spots",
+      });
+
+      assert.equal(res.statusCode, 200);
+      assert.deepEqual(JSON.parse(res.payload), []);
+    });
+
     test("GET /spots returns 500 on unknown error", async (t) => {
       const app = await build(t, {
         spotsRepository: {
