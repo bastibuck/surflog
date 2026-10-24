@@ -134,28 +134,6 @@ describe("Module: spots", () => {
       assert.equal(JSON.parse(res.payload).message, "Spot already exists");
     });
 
-    test("POST /spots fails on unhandled errors", async (t) => {
-      const app = await build(t, {
-        spotsRepository: {
-          ...fakeSpotsRepository,
-          create: async () => {
-            throw new Error("Should trigger global error handler");
-          },
-        },
-      });
-
-      const res = await app.inject({
-        url: "/spots",
-        method: "POST",
-        payload: {
-          name: "Some duplicate name",
-        },
-      });
-
-      assert.equal(res.statusCode, 500);
-      assert.equal(JSON.parse(res.payload).message, "Failed to create spot");
-    });
-
     test("POST /spots returns 500 on unknown error", async (t) => {
       const app = await build(t, {
         spotsRepository: {
