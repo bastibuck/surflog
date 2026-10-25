@@ -23,5 +23,6 @@ jobs:
           node-version: 26
           cache: "pnpm"
 
+      - run: pnpm -r i --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
