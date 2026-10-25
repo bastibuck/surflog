@@ -10,7 +10,11 @@ allowBuilds:
 
 catalog:
   "@types/node": ^26.6.5
-  oxlint: ^1.88.0
+  oxlint: ^1.89.0
   prettier: ^3.9.10
   typescript: "^7.0.2"
   zod: ^4.6.7
+
+permissions:
+  drizzle-kit:
+    skills: true
