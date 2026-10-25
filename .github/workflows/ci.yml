@@ -28,6 +28,6 @@ jobs:
       - run: pnpm -r build
       - run: pnpm -r test
         env:
-          DATABASE_URL: fake-db-uri-we-are-not-using
+          DATABASE_URL: postgresql://username:password@localhost:5432/database_name # fake URL we are not using in tests and only provide for start-up
       - name: validate openapi spec is up to date
         run: pnpm --filter backend openapi:generate && git diff --exit-code
