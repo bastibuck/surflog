@@ -27,5 +27,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm -r build
       - run: pnpm -r test
+        env:
+          DATABASE_URL: fake-db-uri-we-are-not-using
       - name: validate openapi spec is up to date
         run: pnpm --filter backend openapi:generate && git diff --exit-code
