@@ -7,8 +7,11 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
+    env:
+      # fake URL we are not using in tests and only provide for start-up
+      DATABASE_URL: postgresql://username:password@localhost:5432/database_name
 
     steps:
       - uses: actions/checkout@v7
@@ -27,7 +30,5 @@ jobs:
       - run: pnpm format:check
       - run: pnpm -r build
       - run: pnpm -r test
-        env:
-          DATABASE_URL: postgresql://username:password@localhost:5432/database_name # fake URL we are not using in tests and only provide for start-up
       - name: validate openapi spec is up to date
         run: pnpm --filter backend openapi:generate && git diff --exit-code
