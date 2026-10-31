@@ -4,7 +4,7 @@ import {
   date,
   pgTable,
   smallint,
-  unique,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -30,7 +30,14 @@ export const sessionsTable = pgTable(
       .references(() => sailsTable.id),
   },
   (t) => [
-    unique().on(t.name, t.date),
-    check("sessions_rating_check", sql`${t.rating} between 1 and 10`),
+    check(
+      sessionsTableConstraints.sessionsRatingCheck,
+      sql`${t.rating} between 1 and 10`,
+    ),
+    uniqueIndex("sessions_name_date_unique").on(sql`lower(${t.name})`, t.date),
   ],
 );
+
+export const sessionsTableConstraints = {
+  sessionsRatingCheck: "sessions_rating_check",
+} as const;

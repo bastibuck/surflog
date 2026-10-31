@@ -8,6 +8,7 @@ import { brandsTable } from "../gear/models/Brand.model.ts";
 import { sailsTable } from "../gear/models/Sail.model.ts";
 import { spotsTable } from "../spots/models/Spot.model.ts";
 import { sessionsTable } from "./models/Session.model.ts";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 const createSessionsRepository = (db: FastifyInstance["db"]) => {
   return {
@@ -18,6 +19,9 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
             id: true,
             name: true,
             date: true,
+          },
+          orderBy: {
+            date: "desc",
           },
         }),
       ),
@@ -73,24 +77,54 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
     create: (session: CreateSessionPayload) =>
       withDatabaseResult(() =>
         db.transaction(async (tx) => {
-          const brandId = await resolveBrandId(tx, session.sail.brand);
-          const sailId = await resolveSailId(tx, session.sail, brandId);
-          const spotId = await resolveSpotId(tx, session.spot);
+          let spotId: InferInsertModel<typeof spotsTable>["id"];
+          let sailId: InferInsertModel<typeof sailsTable>["id"];
 
-          await tx.insert(sessionsTable).values({
-            date: session.date,
-            name: session.name,
-            rating: session.rating,
-            notes: session.notes,
-            sailId: sailId,
-            spotId: spotId,
-          });
+          if (session.sail.action === "create") {
+            let brandId: InferInsertModel<typeof brandsTable>["id"];
+
+            if (session.sail.brand.action === "create") {
+              brandId = await createBrand(tx, session.sail.brand);
+            } else {
+              brandId = await resolveBrandId(tx, session.sail.brand.id);
+            }
+
+            sailId = await createSail(tx, {
+              size: session.sail.size,
+              alias: session.sail.alias,
+              brandId: brandId,
+            });
+          } else {
+            sailId = await resolveSailId(tx, session.sail.id);
+          }
+
+          if (session.spot.action === "create") {
+            spotId = await createSpot(tx, session.spot);
+          } else {
+            spotId = await resolveSpotId(tx, session.spot.id);
+          }
+
+          const [newSession] = await tx
+            .insert(sessionsTable)
+            .values({
+              date: session.date,
+              name: session.name,
+              rating: session.rating,
+              notes: session.notes,
+              sailId: sailId,
+              spotId: spotId,
+            })
+            .returning();
+
+          return {
+            id: newSession.id,
+          };
         }),
       ),
 
     delete: (id: string) =>
       withDatabaseResult(async () => {
-        db.delete(sessionsTable).where(eq(sessionsTable.id, id));
+        await db.delete(sessionsTable).where(eq(sessionsTable.id, id));
       }),
   } satisfies Repository;
 };
@@ -101,23 +135,26 @@ export type SessionsRepository = ReturnType<typeof createSessionsRepository>;
 
 const resolveBrandId = async (
   tx: FastifyInstance["db"],
-  brand: CreateSessionPayload["sail"]["brand"],
+  brandId: InferSelectModel<typeof brandsTable>["id"],
 ) => {
-  if (brand.id) {
-    const existingBrand = await tx.query.brands.findFirst({
-      columns: { id: true },
-      where: {
-        id: brand.id,
-      },
-    });
+  const existingBrand = await tx.query.brands.findFirst({
+    columns: { id: true },
+    where: {
+      id: brandId,
+    },
+  });
 
-    if (!existingBrand) {
-      throw new EntityNotFoundError("brands", brand.name);
-    }
-
-    return existingBrand.id;
+  if (!existingBrand) {
+    throw new EntityNotFoundError("brands", brandId);
   }
 
+  return existingBrand.id;
+};
+
+const createBrand = async (
+  tx: FastifyInstance["db"],
+  brand: InferInsertModel<typeof brandsTable>,
+) => {
   const [newBrand] = await tx
     .insert(brandsTable)
     .values({
@@ -125,78 +162,71 @@ const resolveBrandId = async (
     })
     .returning();
 
-  if (!newBrand) {
-    throw new EntityNotFoundError("brands", brand.name);
-  }
-
   return newBrand.id;
 };
 
 const resolveSailId = async (
   tx: FastifyInstance["db"],
-  sail: CreateSessionPayload["sail"],
-  brandId: string,
+  sailId: InferSelectModel<typeof sailsTable>["id"],
 ) => {
-  if (sail.id) {
-    const existingSail = await tx.query.sails.findFirst({
-      columns: { id: true },
-      where: {
-        id: sail.id,
-      },
-    });
+  const existingSail = await tx.query.sails.findFirst({
+    columns: { id: true, brandId: true },
+    where: {
+      id: sailId,
+    },
+  });
 
-    if (!existingSail) {
-      throw new EntityNotFoundError("sails", `${sail.brand.name} ${sail.size}`);
-    }
-
-    return existingSail.id;
+  if (!existingSail) {
+    throw new EntityNotFoundError("sails", sailId);
   }
 
+  return existingSail.id;
+};
+
+const createSail = async (
+  tx: FastifyInstance["db"],
+  sail: InferInsertModel<typeof sailsTable>,
+) => {
   const [newSail] = await tx
     .insert(sailsTable)
     .values({
       size: sail.size,
       alias: sail.alias,
-      brandId: brandId,
+      brandId: sail.brandId,
     })
     .returning();
-
-  if (!newSail) {
-    throw new EntityNotFoundError("sails", `${sail.brand.name} ${sail.size}`);
-  }
 
   return newSail.id;
 };
 
 const resolveSpotId = async (
   tx: FastifyInstance["db"],
-  spot: CreateSessionPayload["spot"],
+  spotId: InferSelectModel<typeof spotsTable>["id"],
 ) => {
-  if (spot.id) {
-    const existingSpot = await tx.query.spots.findFirst({
-      columns: { id: true },
-      where: {
-        id: spot.id,
-      },
-    });
+  const existingSpot = await tx.query.spots.findFirst({
+    columns: { id: true },
+    where: {
+      id: spotId,
+    },
+  });
 
-    if (!existingSpot) {
-      throw new EntityNotFoundError("spots", spot.name);
-    }
-
-    return existingSpot.id;
+  if (!existingSpot) {
+    throw new EntityNotFoundError("spots", spotId);
   }
 
+  return existingSpot.id;
+};
+
+const createSpot = async (
+  tx: FastifyInstance["db"],
+  spot: InferInsertModel<typeof spotsTable>,
+) => {
   const [newSpot] = await tx
     .insert(spotsTable)
     .values({
       name: spot.name,
     })
     .returning();
-
-  if (!newSpot) {
-    throw new EntityNotFoundError("spots", spot.name);
-  }
 
   return newSpot.id;
 };

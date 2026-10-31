@@ -24,28 +24,59 @@ const GetSessionsListResponseSchema = SessionBaseSchema.pick({
 
 const GetSessionResponseSchema = SessionBaseSchema;
 
-const CreateSessionPayloadSchema = SessionBaseSchema.omit({
-  id: true,
-}).extend({
-  spot: z.object({
-    id: z.uuid().nullable(),
+const SpotSelectionSchema = z.discriminatedUnion("action", [
+  z.strictObject({
+    action: z.literal("reference"),
+    id: z.uuid(),
+  }),
+  z.strictObject({
+    action: z.literal("create"),
     name: z.string().max(50).nonempty(),
   }),
-  sail: z.object({
-    id: z.uuid().nullable(),
+]);
+
+const BrandSelectionSchema = z.discriminatedUnion("action", [
+  z.strictObject({
+    action: z.literal("reference"),
+    id: z.uuid(),
+  }),
+  z.strictObject({
+    action: z.literal("create"),
+    name: z.string().max(100).nonempty(),
+  }),
+]);
+
+const SailSelectionSchema = z.discriminatedUnion("action", [
+  z.strictObject({
+    action: z.literal("reference"),
+    id: z.uuid(),
+  }),
+  z.strictObject({
+    action: z.literal("create"),
     size: z.number().int().positive(),
     alias: z.string().max(30).nullable(),
-    brand: z.object({
-      id: z.uuid().nullable(),
-      name: z.string().max(100).nonempty(),
-    }),
+    brand: BrandSelectionSchema,
   }),
+]);
+
+const CreateSessionPayloadSchema = SessionBaseSchema.omit({
+  id: true,
+  spot: true,
+  sail: true,
+}).extend({
+  spot: SpotSelectionSchema,
+  sail: SailSelectionSchema,
+});
+
+const CreateSessionResponseSchema = SessionBaseSchema.pick({
+  id: true,
 });
 
 export {
   GetSessionsListResponseSchema,
   GetSessionResponseSchema,
   CreateSessionPayloadSchema,
+  CreateSessionResponseSchema,
 };
 
 export type CreateSessionPayload = z.infer<typeof CreateSessionPayloadSchema>;
