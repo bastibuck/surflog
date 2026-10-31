@@ -49,9 +49,10 @@ describe("Module: gear", () => {
         .returning({ id: brandsTable.id });
 
       await testDb.insert(sailsTable).values([
-        { brandId: gaastraBrand[0].id, size: 9, alias: "Gaastra 9" },
-        { brandId: gaastraBrand[0].id, size: 7, alias: "Gaastra 7" },
-        { brandId: duotoneBrand[0].id, size: 9, alias: "Duotone 9" },
+        { brandId: gaastraBrand[0].id, size: 9 },
+        { brandId: gaastraBrand[0].id, size: 7, alias: "My alias" },
+        { brandId: duotoneBrand[0].id, size: 9 },
+        { brandId: gaastraBrand[0].id, size: 7, alias: "Custom alias" },
       ]);
 
       const repo = createGearRepository(testDb);
@@ -59,18 +60,11 @@ describe("Module: gear", () => {
       const sails = await repo.listSails();
 
       assert.strictEqual(sails.success, true);
-      assert.strictEqual(sails.data.length, 3);
-      assert.strictEqual(sails.data[0].size, 7);
-      assert.strictEqual(sails.data[0].brand, "Gaastra");
-      assert.strictEqual(sails.data[0].alias, "Gaastra 7");
-
-      assert.strictEqual(sails.data[1].size, 9);
-      assert.strictEqual(sails.data[1].brand, "Duotone");
-      assert.strictEqual(sails.data[1].alias, "Duotone 9");
-
-      assert.strictEqual(sails.data[2].size, 9);
-      assert.strictEqual(sails.data[2].brand, "Gaastra");
-      assert.strictEqual(sails.data[2].alias, "Gaastra 9");
+      assert.strictEqual(sails.data.length, 4);
+      assert.strictEqual(sails.data[0].displayName, "Duotone 9");
+      assert.strictEqual(sails.data[1].displayName, "Gaastra 7 | Custom alias");
+      assert.strictEqual(sails.data[2].displayName, "Gaastra 7 | My alias");
+      assert.strictEqual(sails.data[3].displayName, "Gaastra 9");
     });
   });
 });

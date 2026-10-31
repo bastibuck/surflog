@@ -10,10 +10,4 @@ const GetSpotsListResponseSchema = SpotBaseSchema.pick({
   name: true,
 }).array();
 
-const CreateSpotPayloadSchema = SpotBaseSchema.pick({
-  name: true,
-});
-
-export { GetSpotsListResponseSchema, CreateSpotPayloadSchema };
-
-export type CreateSpotPayload = z.infer<typeof CreateSpotPayloadSchema>;
+export { GetSpotsListResponseSchema };

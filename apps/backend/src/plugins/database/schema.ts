@@ -1,7 +1,13 @@
 import { defineRelations } from "drizzle-orm";
 import { brandsTable } from "../../modules/gear/models/Brand.model.ts";
-import { sailsTable } from "../../modules/gear/models/Sail.model.ts";
-import { sessionsTable } from "../../modules/sessions/models/Session.model.ts";
+import {
+  sailsTable,
+  sailsTableConstraints,
+} from "../../modules/gear/models/Sail.model.ts";
+import {
+  sessionsTable,
+  sessionsTableConstraints,
+} from "../../modules/sessions/models/Session.model.ts";
 import { spotsTable } from "../../modules/spots/models/Spot.model.ts";
 
 const schema = {
@@ -44,7 +50,13 @@ const relations = defineRelations(schema, (relationBuilder) => ({
   },
 }));
 
+const constraints = {
+  ...sailsTableConstraints,
+  ...sessionsTableConstraints,
+};
+
 export { relations, schema };
 
 export type Schema = typeof schema;
 export type TableName = keyof Schema;
+export type Constraint = (typeof constraints)[keyof typeof constraints];

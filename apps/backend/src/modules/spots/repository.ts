@@ -2,8 +2,6 @@ import type { FastifyInstance } from "fastify";
 
 import { withDatabaseResult } from "../../lib/database.ts";
 import type { Repository } from "../../lib/types/Repository.ts";
-import { spotsTable } from "./models/Spot.model.ts";
-import type { CreateSpotPayload } from "@surflog/shared/api-schema/spots/SpotSchema";
 
 const createSpotsRepository = (db: FastifyInstance["db"]) => {
   return {
@@ -13,13 +11,6 @@ const createSpotsRepository = (db: FastifyInstance["db"]) => {
           orderBy: {
             name: "asc",
           },
-        }),
-      ),
-
-    create: (spot: CreateSpotPayload) =>
-      withDatabaseResult(() =>
-        db.transaction(async (tx) => {
-          await tx.insert(spotsTable).values(spot);
         }),
       ),
   } satisfies Repository;

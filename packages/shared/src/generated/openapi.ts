@@ -66,9 +66,7 @@ export interface paths {
                         "application/json": {
                             /** Format: uuid */
                             id: string;
-                            size: number;
-                            alias: string | null;
-                            brand: string;
+                            displayName: string;
                         }[];
                     };
                 };
@@ -171,15 +169,33 @@ export interface paths {
                         rating: number;
                         notes: string | null;
                         spot: {
-                            id: string | null;
+                            /** @enum {string} */
+                            action: "reference";
+                            /** Format: uuid */
+                            id: string;
+                        } | {
+                            /** @enum {string} */
+                            action: "create";
                             name: string;
                         };
                         sail: {
-                            id: string | null;
+                            /** @enum {string} */
+                            action: "reference";
+                            /** Format: uuid */
+                            id: string;
+                        } | {
+                            /** @enum {string} */
+                            action: "create";
                             size: number;
                             alias: string | null;
                             brand: {
-                                id: string | null;
+                                /** @enum {string} */
+                                action: "reference";
+                                /** Format: uuid */
+                                id: string;
+                            } | {
+                                /** @enum {string} */
+                                action: "create";
                                 name: string;
                             };
                         };
@@ -192,7 +208,12 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            id: string;
+                        };
+                    };
                 };
             };
         };
@@ -306,30 +327,7 @@ export interface paths {
             };
         };
         put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        name: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Spot created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;

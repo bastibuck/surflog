@@ -87,9 +87,7 @@ describe("Module: gear", () => {
               success([
                 {
                   id: "a3695ab6-c94a-444c-ae0a-215b10e20249",
-                  brand: "Brand eins",
-                  size: 9,
-                  alias: null,
+                  displayName: "Brand eins 9",
                 },
               ]),
           },
@@ -103,9 +101,7 @@ describe("Module: gear", () => {
         assert.deepEqual(JSON.parse(res.payload), [
           {
             id: "a3695ab6-c94a-444c-ae0a-215b10e20249",
-            brand: "Brand eins",
-            size: 9,
-            alias: null,
+            displayName: "Brand eins 9",
           },
         ]);
       });

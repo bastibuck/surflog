@@ -1,6 +1,7 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
   CreateSessionPayloadSchema,
+  CreateSessionResponseSchema,
   GetSessionResponseSchema,
   GetSessionsListResponseSchema,
 } from "@surflog/shared/api-schema/sessions/SessionSchema";
@@ -65,7 +66,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         tags: ["sessions"],
         body: CreateSessionPayloadSchema,
         response: {
-          201: z.undefined().describe("Session created"),
+          201: CreateSessionResponseSchema.describe("Session created"),
         },
       },
     },
@@ -118,7 +119,7 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         return reply.internalServerError("Failed to create session");
       }
 
-      return reply.status(201).send();
+      return reply.status(201).send(result.data);
     },
   );
 
