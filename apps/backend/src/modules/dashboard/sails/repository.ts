@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, lte } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type z from "zod";
 
@@ -23,10 +23,7 @@ const createSailsDashboardRepository = (db: FastifyInstance["db"]) => {
             db
               .select({
                 sailId: sessionsTable.sailId,
-                count:
-                  sql<number>`cast(count(${sessionsTable.sailId}) as int)`.as(
-                    "count",
-                  ),
+                count: count(sessionsTable.sailId).as("count"),
               })
               .from(sessionsTable)
               .where(
