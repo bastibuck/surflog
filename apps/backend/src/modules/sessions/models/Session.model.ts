@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   check,
   date,
+  index,
   pgTable,
   smallint,
   uniqueIndex,
@@ -35,6 +36,8 @@ export const sessionsTable = pgTable(
       sql`${t.rating} between 1 and 10`,
     ),
     uniqueIndex("sessions_name_date_unique").on(sql`lower(${t.name})`, t.date),
+    index("sessions_sail_id_index").on(t.sailId),
+    index("sessions_spot_id_index").on(t.spotId),
   ],
 );
 

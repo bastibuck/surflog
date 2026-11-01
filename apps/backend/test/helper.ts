@@ -57,9 +57,11 @@ const createTestDbClient = (connectionUri: string) => {
   return drizzle(connectionUri, { relations });
 };
 
+export type TestDb = ReturnType<typeof createTestDbClient>;
+
 function setupTestDatabase() {
   let postgresContainer: StartedPostgreSqlContainer;
-  let testDb: ReturnType<typeof createTestDbClient>;
+  let testDb: TestDb;
 
   test.before(async () => {
     postgresContainer = await new PostgreSqlContainer(
