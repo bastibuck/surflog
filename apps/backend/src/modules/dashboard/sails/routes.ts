@@ -4,12 +4,12 @@ import {
   GetMostUsedSailsResponseSchema,
 } from "@surflog/shared/api-schema/dashboard/DashboardSchema";
 
-const gearRoutes: FastifyPluginAsyncZod = async (fastify) => {
+const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/most-used",
     {
       schema: {
-        tags: ["dashboard", "sails"],
+        tags: ["dashboard"],
         response: {
           200: GetMostUsedSailsResponseSchema.describe(
             "List of up to three most used sails",
@@ -32,4 +32,4 @@ const gearRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 };
 
-export default gearRoutes;
+export default dashboardSailsRoutes;

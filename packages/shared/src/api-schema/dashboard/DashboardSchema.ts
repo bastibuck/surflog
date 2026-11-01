@@ -1,18 +1,7 @@
 import { z } from "zod";
 
-/**
- * most used sails
- */
-const GetMostUsedSailsResponseSchema = z
-  .object({
-    id: z.uuid(),
-    displayName: z.string(),
-    count: z.number().positive().int(),
-  })
-  .array()
-  .max(3);
-
-const GetMostUsedSailsFiltersSchema = z
+// generic
+const DateFilterSchema = z
   .object({
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
@@ -30,4 +19,37 @@ const GetMostUsedSailsFiltersSchema = z
     }
   });
 
-export { GetMostUsedSailsResponseSchema, GetMostUsedSailsFiltersSchema };
+/**
+ * most used sails
+ */
+const GetMostUsedSailsResponseSchema = z
+  .object({
+    id: z.uuid(),
+    displayName: z.string(),
+    count: z.number().positive().int(),
+  })
+  .array()
+  .max(3);
+
+const GetMostUsedSailsFiltersSchema = DateFilterSchema;
+
+/**
+ * most visited spots
+ */
+const GetMostVisitedSpotsResponseSchema = z
+  .object({
+    id: z.uuid(),
+    name: z.string(),
+    count: z.number().positive().int(),
+  })
+  .array()
+  .max(3);
+
+const GetMostVisitedSpotsFiltersSchema = DateFilterSchema;
+
+export {
+  GetMostUsedSailsResponseSchema,
+  GetMostUsedSailsFiltersSchema,
+  GetMostVisitedSpotsResponseSchema,
+  GetMostVisitedSpotsFiltersSchema,
+};
