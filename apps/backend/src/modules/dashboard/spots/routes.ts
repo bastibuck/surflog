@@ -1,5 +1,7 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
+  GetBestSpotFiltersSchema,
+  GetBestSpotResponseSchema,
   GetMostVisitedSpotsFiltersSchema,
   GetMostVisitedSpotsResponseSchema,
 } from "@surflog/shared/api-schema/dashboard/DashboardSchema";
@@ -27,6 +29,30 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         return reply.internalServerError(
           "Failed to retrieve most visited spots",
         );
+      }
+
+      return result.data;
+    },
+  );
+
+  fastify.get(
+    "/best-spot",
+    {
+      schema: {
+        tags: ["dashboard"],
+        response: {
+          200: GetBestSpotResponseSchema.describe("Spot with highest ranking"),
+        },
+        querystring: GetBestSpotFiltersSchema,
+      },
+    },
+    async function (request, reply) {
+      const result = await fastify.spotsDashboardRepository.getBestSpot(
+        request.query,
+      );
+
+      if (result.success === false) {
+        return reply.internalServerError("Failed to retrieve best spot");
       }
 
       return result.data;

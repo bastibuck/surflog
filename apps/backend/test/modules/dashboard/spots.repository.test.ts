@@ -33,7 +33,13 @@ let currentSessionCount = 0; // used to generate unique session names
 const createSessionForSpot = async (
   testDb: TestDb,
   spotId: string,
-  date: string = "2026-10-12",
+  {
+    date = "2026-10-12",
+    rating = 10,
+  }: {
+    date?: string;
+    rating?: number;
+  } = {},
 ) => {
   await testDb.insert(sessionsTable).values([
     {
@@ -41,7 +47,7 @@ const createSessionForSpot = async (
       spotId,
       sailId: SAILS[0].id,
       name: `Session ${currentSessionCount++}`,
-      rating: 10,
+      rating,
     },
   ]);
 };
@@ -197,12 +203,12 @@ describe("Module: dashboard", () => {
       test("should filter by date correctly", async () => {
         const testDb = getTestDb();
 
-        await createSessionForSpot(testDb, SPOTS[1].id, "2026-10-10");
-        await createSessionForSpot(testDb, SPOTS[1].id, "2026-10-11");
-        await createSessionForSpot(testDb, SPOTS[0].id, "2026-10-12");
-        await createSessionForSpot(testDb, SPOTS[0].id, "2026-10-13");
-        await createSessionForSpot(testDb, SPOTS[1].id, "2026-10-14");
-        await createSessionForSpot(testDb, SPOTS[1].id, "2026-10-15");
+        await createSessionForSpot(testDb, SPOTS[1].id, { date: "2026-10-10" });
+        await createSessionForSpot(testDb, SPOTS[1].id, { date: "2026-10-11" });
+        await createSessionForSpot(testDb, SPOTS[0].id, { date: "2026-10-12" });
+        await createSessionForSpot(testDb, SPOTS[0].id, { date: "2026-10-13" });
+        await createSessionForSpot(testDb, SPOTS[1].id, { date: "2026-10-14" });
+        await createSessionForSpot(testDb, SPOTS[1].id, { date: "2026-10-15" });
 
         const repo = createSpotsDashboardRepository(testDb);
 
@@ -268,6 +274,148 @@ describe("Module: dashboard", () => {
             count: 1,
           },
         ]);
+      });
+    });
+
+    describe("Best spot by session ratings", () => {
+      test("should return null if there are no sessions", async () => {
+        const testDb = getTestDb();
+
+        const repo = createSpotsDashboardRepository(testDb);
+
+        const result = await repo.getBestSpot();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, null);
+      });
+
+      test("should return null if there are no spots", async () => {
+        const testDb = getTestDb();
+
+        await testDb.delete(spotsTable);
+
+        const repo = createSpotsDashboardRepository(testDb);
+
+        const result = await repo.getBestSpot();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, null);
+      });
+
+      test("should return best spot based on session ratings", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSpot(testDb, SPOTS[0].id, { rating: 4 });
+        await createSessionForSpot(testDb, SPOTS[0].id, { rating: 5 });
+
+        await createSessionForSpot(testDb, SPOTS[1].id, { rating: 5 });
+        await createSessionForSpot(testDb, SPOTS[1].id, { rating: 10 });
+
+        await createSessionForSpot(testDb, SPOTS[2].id, { rating: 6 });
+        await createSessionForSpot(testDb, SPOTS[2].id, { rating: 1 });
+        await createSessionForSpot(testDb, SPOTS[2].id, { rating: 2 });
+        await createSessionForSpot(testDb, SPOTS[2].id, { rating: 3 });
+
+        const repo = createSpotsDashboardRepository(testDb);
+
+        const result = await repo.getBestSpot();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, {
+          id: SPOTS[1].id,
+          name: SPOTS[1].name,
+          averageRating: 7.5,
+          sessionCount: 2,
+        });
+      });
+
+      test("should use spot name as tie-breaker on same rating", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSpot(testDb, SPOTS[3].id, { rating: 10 });
+        await createSessionForSpot(testDb, SPOTS[2].id, { rating: 10 });
+
+        const repo = createSpotsDashboardRepository(testDb);
+
+        const result = await repo.getBestSpot();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, {
+          id: SPOTS[2].id,
+          name: SPOTS[2].name,
+          averageRating: 10,
+          sessionCount: 1,
+        });
+      });
+
+      test("should filter by date correctly", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSpot(testDb, SPOTS[1].id, {
+          date: "2026-10-10",
+          rating: 10,
+        });
+        await createSessionForSpot(testDb, SPOTS[1].id, {
+          date: "2026-10-11",
+          rating: 8,
+        });
+        await createSessionForSpot(testDb, SPOTS[0].id, {
+          date: "2026-10-12",
+          rating: 6,
+        });
+        await createSessionForSpot(testDb, SPOTS[0].id, {
+          date: "2026-10-13",
+          rating: 10,
+        });
+        await createSessionForSpot(testDb, SPOTS[1].id, {
+          date: "2026-10-14",
+          rating: 2,
+        });
+        await createSessionForSpot(testDb, SPOTS[1].id, {
+          date: "2026-10-15",
+          rating: 2,
+        });
+
+        const repo = createSpotsDashboardRepository(testDb);
+
+        const notFiltered = await repo.getBestSpot();
+        assert.strictEqual(notFiltered.success, true);
+        assert.deepStrictEqual(notFiltered.data, {
+          id: SPOTS[0].id,
+          name: SPOTS[0].name,
+          averageRating: 8,
+          sessionCount: 2,
+        });
+
+        const filteredFrom = await repo.getBestSpot({ from: "2026-10-13" });
+        assert.strictEqual(filteredFrom.success, true);
+        assert.deepStrictEqual(filteredFrom.data, {
+          id: SPOTS[0].id,
+          name: SPOTS[0].name,
+          averageRating: 10,
+          sessionCount: 1,
+        });
+
+        const filteredTo = await repo.getBestSpot({ to: "2026-10-13" });
+        assert.strictEqual(filteredTo.success, true);
+        assert.deepStrictEqual(filteredTo.data, {
+          id: SPOTS[1].id,
+          name: SPOTS[1].name,
+          averageRating: 9,
+          sessionCount: 2,
+        });
+
+        const filteredFromAndTo = await repo.getBestSpot({
+          from: "2026-10-13",
+          to: "2026-10-14",
+        });
+        assert.strictEqual(filteredFromAndTo.success, true);
+        assert.deepStrictEqual(filteredFromAndTo.data, {
+          id: SPOTS[0].id,
+          name: SPOTS[0].name,
+          averageRating: 10,
+          sessionCount: 1,
+        });
       });
     });
   });

@@ -1,8 +1,11 @@
-import { and, asc, count, desc, eq, gte, lte } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type z from "zod";
 
-import type { GetMostVisitedSpotsFiltersSchema } from "@surflog/shared/api-schema/dashboard/DashboardSchema";
+import {
+  GetBestSpotFiltersSchema,
+  type GetMostVisitedSpotsFiltersSchema,
+} from "@surflog/shared/api-schema/dashboard/DashboardSchema";
 
 import { withDatabaseResult } from "../../../lib/database.ts";
 import type { Repository } from "../../../lib/types/Repository.ts";
@@ -49,6 +52,53 @@ const createSpotsDashboardRepository = (db: FastifyInstance["db"]) => {
           )
           .orderBy(desc(sessionCountsBySpotIdCTE.count), asc(spotsTable.name))
           .limit(3);
+      }),
+
+    getBestSpot: (filters: z.infer<typeof GetBestSpotFiltersSchema> = {}) =>
+      withDatabaseResult(async () => {
+        const sessionCountAndAvgRatingBySpotIdCTE = db
+          .$with("spot_ids_to_avg_session_rating")
+          .as(
+            db
+              .select({
+                spotId: sessionsTable.spotId,
+                averageRating: sql`avg(${sessionsTable.rating})`
+                  .mapWith(Number)
+                  .as("average_rating"),
+                sessionCount: count(sessionsTable.id).as("session_count"),
+              })
+              .from(sessionsTable)
+              .where(
+                and(
+                  filters.from
+                    ? gte(sessionsTable.date, filters.from)
+                    : undefined,
+                  filters.to ? lte(sessionsTable.date, filters.to) : undefined,
+                ),
+              )
+              .groupBy(sessionsTable.spotId),
+          );
+
+        const [bestSpot] = await db
+          .with(sessionCountAndAvgRatingBySpotIdCTE)
+          .select({
+            id: spotsTable.id,
+            name: spotsTable.name,
+            averageRating: sessionCountAndAvgRatingBySpotIdCTE.averageRating,
+            sessionCount: sessionCountAndAvgRatingBySpotIdCTE.sessionCount,
+          })
+          .from(spotsTable)
+          .innerJoin(
+            sessionCountAndAvgRatingBySpotIdCTE,
+            eq(sessionCountAndAvgRatingBySpotIdCTE.spotId, spotsTable.id),
+          )
+          .orderBy(
+            desc(sessionCountAndAvgRatingBySpotIdCTE.averageRating),
+            asc(spotsTable.name),
+          )
+          .limit(1);
+
+        return bestSpot ?? null;
       }),
   } satisfies Repository;
 };
