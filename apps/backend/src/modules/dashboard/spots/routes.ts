@@ -36,12 +36,14 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 
   fastify.get(
-    "/best-spot",
+    "/top-three",
     {
       schema: {
         tags: ["dashboard"],
         response: {
-          200: GetBestSpotsResponseSchema.describe("Spot with highest ranking"),
+          200: GetBestSpotsResponseSchema.describe(
+            "List of up to three best spots based on session ratings",
+          ),
         },
         querystring: GetBestSpotsFiltersSchema,
       },
@@ -52,7 +54,7 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       );
 
       if (result.success === false) {
-        return reply.internalServerError("Failed to retrieve best spot");
+        return reply.internalServerError("Failed to retrieve best spots");
       }
 
       return result.data;

@@ -1,5 +1,7 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
+  GetBestSailsFiltersSchema,
+  GetBestSailsResponseSchema,
   GetMostUsedSailsFiltersSchema,
   GetMostUsedSailsResponseSchema,
 } from "@surflog/shared/api-schema/dashboard/DashboardSchema";
@@ -25,6 +27,32 @@ const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
 
       if (result.success === false) {
         return reply.internalServerError("Failed to retrieve most used sails");
+      }
+
+      return result.data;
+    },
+  );
+
+  fastify.get(
+    "/top-three",
+    {
+      schema: {
+        tags: ["dashboard"],
+        response: {
+          200: GetBestSailsResponseSchema.describe(
+            "List of up to three best sails based on session ratings",
+          ),
+        },
+        querystring: GetBestSailsFiltersSchema,
+      },
+    },
+    async function (request, reply) {
+      const result = await fastify.sailsDashboardRepository.getBestSails(
+        request.query,
+      );
+
+      if (result.success === false) {
+        return reply.internalServerError("Failed to retrieve best sails");
       }
 
       return result.data;

@@ -84,6 +84,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/dashboard/sails/best": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    from?: string;
+                    to?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of up to three best sails based on session ratings */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            id: string;
+                            displayName: string;
+                            averageRating: number;
+                            sessionCount: number;
+                        }[];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dashboard/spots/most-visited": {
         parameters: {
             query?: never;
@@ -127,7 +171,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/dashboard/spots/best-spot": {
+    "/dashboard/spots/best": {
         parameters: {
             query?: never;
             header?: never;
@@ -146,7 +190,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Spot with highest ranking */
+                /** @description List of up to three best spots based on session ratings */
                 200: {
                     headers: {
                         [name: string]: unknown;
