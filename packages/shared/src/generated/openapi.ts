@@ -84,7 +84,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/dashboard/sails/best": {
+    "/dashboard/sails/top-three": {
         parameters: {
             query?: never;
             header?: never;
@@ -171,7 +171,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/dashboard/spots/best": {
+    "/dashboard/spots/top-three": {
         parameters: {
             query?: never;
             header?: never;
