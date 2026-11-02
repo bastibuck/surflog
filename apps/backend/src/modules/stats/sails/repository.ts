@@ -5,7 +5,7 @@ import type z from "zod";
 import {
   GetBestSailsFiltersSchema,
   GetMostUsedSailsFiltersSchema,
-} from "@surflog/shared/api-schema/dashboard/DashboardSchema";
+} from "@surflog/shared/api-schema/stats/StatsSchema";
 
 import { withDatabaseResult } from "../../../lib/database.ts";
 import type { Repository } from "../../../lib/types/Repository.ts";
@@ -14,7 +14,7 @@ import { sailsTable } from "../../gear/models/Sail.model.ts";
 import { sailsDisplayNameSql } from "../../gear/utils/sails.utils.ts";
 import { sessionsTable } from "../../sessions/models/Session.model.ts";
 
-const createSailsDashboardRepository = (db: FastifyInstance["db"]) => {
+const createSailsStatsRepository = (db: FastifyInstance["db"]) => {
   return {
     getMostUsed: (
       filters: z.infer<typeof GetMostUsedSailsFiltersSchema> = {},
@@ -105,8 +105,8 @@ const createSailsDashboardRepository = (db: FastifyInstance["db"]) => {
   } satisfies Repository;
 };
 
-export { createSailsDashboardRepository };
+export { createSailsStatsRepository };
 
-export type SailsDashboardRepository = ReturnType<
-  typeof createSailsDashboardRepository
+export type SailsStatsRepository = ReturnType<
+  typeof createSailsStatsRepository
 >;

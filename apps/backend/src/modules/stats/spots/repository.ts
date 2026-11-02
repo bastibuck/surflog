@@ -5,14 +5,14 @@ import type z from "zod";
 import {
   type GetBestSpotsFiltersSchema,
   type GetMostVisitedSpotsFiltersSchema,
-} from "@surflog/shared/api-schema/dashboard/DashboardSchema";
+} from "@surflog/shared/api-schema/stats/StatsSchema";
 
 import { withDatabaseResult } from "../../../lib/database.ts";
 import type { Repository } from "../../../lib/types/Repository.ts";
 import { sessionsTable } from "../../sessions/models/Session.model.ts";
 import { spotsTable } from "../../spots/models/Spot.model.ts";
 
-const createSpotsDashboardRepository = (db: FastifyInstance["db"]) => {
+const createSpotsStatsRepository = (db: FastifyInstance["db"]) => {
   return {
     getMostVisited: (
       filters: z.infer<typeof GetMostVisitedSpotsFiltersSchema> = {},
@@ -101,8 +101,8 @@ const createSpotsDashboardRepository = (db: FastifyInstance["db"]) => {
   } satisfies Repository;
 };
 
-export { createSpotsDashboardRepository };
+export { createSpotsStatsRepository };
 
-export type SpotsDashboardRepository = ReturnType<
-  typeof createSpotsDashboardRepository
+export type SpotsStatsRepository = ReturnType<
+  typeof createSpotsStatsRepository
 >;

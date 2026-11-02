@@ -5,7 +5,7 @@ import { setupTestDatabase, type TestDb } from "../../helper.ts";
 
 import { brandsTable } from "../../../src/modules/gear/models/Brand.model.ts";
 import { sailsTable } from "../../../src/modules/gear/models/Sail.model.ts";
-import { createSailsDashboardRepository } from "../../../src/modules/dashboard/sails/repository.ts";
+import { createSailsStatsRepository } from "../../../src/modules/stats/sails/repository.ts";
 import { spotsTable } from "../../../src/modules/spots/models/Spot.model.ts";
 import { sessionsTable } from "../../../src/modules/sessions/models/Session.model.ts";
 
@@ -64,7 +64,7 @@ const createSessionForSail = async (
   ]);
 };
 
-describe("Module: dashboard", () => {
+describe("Module: stats", () => {
   const { getTestDb } = setupTestDatabase();
 
   beforeEach(async () => {
@@ -89,7 +89,7 @@ describe("Module: dashboard", () => {
       test("should return an empty array if there are no sessions", async () => {
         const testDb = getTestDb();
 
-        const repo = createSailsDashboardRepository(testDb);
+        const repo = createSailsStatsRepository(testDb);
 
         const result = await repo.getMostUsed();
 
@@ -102,7 +102,7 @@ describe("Module: dashboard", () => {
 
         await testDb.delete(sailsTable);
 
-        const repo = createSailsDashboardRepository(testDb);
+        const repo = createSailsStatsRepository(testDb);
 
         const result = await repo.getMostUsed();
 
@@ -128,7 +128,7 @@ describe("Module: dashboard", () => {
         await createSessionForSail(testDb, SAILS[3].id);
         await createSessionForSail(testDb, SAILS[3].id);
 
-        const repo = createSailsDashboardRepository(testDb);
+        const repo = createSailsStatsRepository(testDb);
 
         const result = await repo.getMostUsed();
 
@@ -159,7 +159,7 @@ describe("Module: dashboard", () => {
         await createSessionForSail(testDb, SAILS[1].id);
         await createSessionForSail(testDb, SAILS[1].id);
 
-        const repo = createSailsDashboardRepository(testDb);
+        const repo = createSailsStatsRepository(testDb);
 
         const result = await repo.getMostUsed();
 
@@ -188,7 +188,7 @@ describe("Module: dashboard", () => {
         await createSessionForSail(testDb, SAILS[3].id);
         await createSessionForSail(testDb, SAILS[3].id);
 
-        const repo = createSailsDashboardRepository(testDb);
+        const repo = createSailsStatsRepository(testDb);
 
         const result = await repo.getMostUsed();
 
@@ -222,7 +222,7 @@ describe("Module: dashboard", () => {
         await createSessionForSail(testDb, SAILS[0].id, "2026-10-14");
         await createSessionForSail(testDb, SAILS[0].id, "2026-10-15");
 
-        const repo = createSailsDashboardRepository(testDb);
+        const repo = createSailsStatsRepository(testDb);
 
         const notFiltered = await repo.getMostUsed();
         assert.strictEqual(notFiltered.success, true);
@@ -286,6 +286,12 @@ describe("Module: dashboard", () => {
             count: 1,
           },
         ]);
+      });
+    });
+
+    describe("Top three sails", () => {
+      test("Impl missing", () => {
+        assert.equal(true, false);
       });
     });
   });

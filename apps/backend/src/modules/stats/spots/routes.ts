@@ -4,14 +4,14 @@ import {
   GetBestSpotsResponseSchema,
   GetMostVisitedSpotsFiltersSchema,
   GetMostVisitedSpotsResponseSchema,
-} from "@surflog/shared/api-schema/dashboard/DashboardSchema";
+} from "@surflog/shared/api-schema/stats/StatsSchema";
 
-const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
+const statsSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/most-visited",
     {
       schema: {
-        tags: ["dashboard"],
+        tags: ["stats"],
         response: {
           200: GetMostVisitedSpotsResponseSchema.describe(
             "List of up to three most visited spots",
@@ -21,7 +21,7 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      const result = await fastify.spotsDashboardRepository.getMostVisited(
+      const result = await fastify.spotsStatsRepository.getMostVisited(
         request.query,
       );
 
@@ -39,7 +39,7 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/top-three",
     {
       schema: {
-        tags: ["dashboard"],
+        tags: ["stats"],
         response: {
           200: GetBestSpotsResponseSchema.describe(
             "List of up to three best spots based on session ratings",
@@ -49,7 +49,7 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      const result = await fastify.spotsDashboardRepository.getBestSpots(
+      const result = await fastify.spotsStatsRepository.getBestSpots(
         request.query,
       );
 
@@ -62,4 +62,4 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 };
 
-export default dashboardSpotsRoutes;
+export default statsSpotsRoutes;

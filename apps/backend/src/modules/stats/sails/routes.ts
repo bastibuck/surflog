@@ -4,14 +4,14 @@ import {
   GetBestSailsResponseSchema,
   GetMostUsedSailsFiltersSchema,
   GetMostUsedSailsResponseSchema,
-} from "@surflog/shared/api-schema/dashboard/DashboardSchema";
+} from "@surflog/shared/api-schema/stats/StatsSchema";
 
-const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
+const statsSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/most-used",
     {
       schema: {
-        tags: ["dashboard"],
+        tags: ["stats"],
         response: {
           200: GetMostUsedSailsResponseSchema.describe(
             "List of up to three most used sails",
@@ -21,7 +21,7 @@ const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      const result = await fastify.sailsDashboardRepository.getMostUsed(
+      const result = await fastify.sailsStatsRepository.getMostUsed(
         request.query,
       );
 
@@ -37,7 +37,7 @@ const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/top-three",
     {
       schema: {
-        tags: ["dashboard"],
+        tags: ["stats"],
         response: {
           200: GetBestSailsResponseSchema.describe(
             "List of up to three best sails based on session ratings",
@@ -47,7 +47,7 @@ const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      const result = await fastify.sailsDashboardRepository.getBestSails(
+      const result = await fastify.sailsStatsRepository.getBestSails(
         request.query,
       );
 
@@ -60,4 +60,4 @@ const dashboardSailsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 };
 
-export default dashboardSailsRoutes;
+export default statsSailsRoutes;

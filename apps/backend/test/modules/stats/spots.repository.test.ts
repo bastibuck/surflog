@@ -5,7 +5,7 @@ import { setupTestDatabase, type TestDb } from "../../helper.ts";
 
 import { brandsTable } from "../../../src/modules/gear/models/Brand.model.ts";
 import { sailsTable } from "../../../src/modules/gear/models/Sail.model.ts";
-import { createSpotsDashboardRepository } from "../../../src/modules/dashboard/spots/repository.ts";
+import { createSpotsStatsRepository } from "../../../src/modules/stats/spots/repository.ts";
 import { sessionsTable } from "../../../src/modules/sessions/models/Session.model.ts";
 import { spotsTable } from "../../../src/modules/spots/models/Spot.model.ts";
 
@@ -52,7 +52,7 @@ const createSessionForSpot = async (
   ]);
 };
 
-describe("Module: dashboard", () => {
+describe("Module: stats", () => {
   const { getTestDb } = setupTestDatabase();
 
   beforeEach(async () => {
@@ -77,7 +77,7 @@ describe("Module: dashboard", () => {
       test("should return an empty array if there are no sessions", async () => {
         const testDb = getTestDb();
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getMostVisited();
 
@@ -90,7 +90,7 @@ describe("Module: dashboard", () => {
 
         await testDb.delete(spotsTable);
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getMostVisited();
 
@@ -116,7 +116,7 @@ describe("Module: dashboard", () => {
         await createSessionForSpot(testDb, SPOTS[3].id);
         await createSessionForSpot(testDb, SPOTS[3].id);
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getMostVisited();
 
@@ -147,7 +147,7 @@ describe("Module: dashboard", () => {
         await createSessionForSpot(testDb, SPOTS[1].id);
         await createSessionForSpot(testDb, SPOTS[1].id);
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getMostVisited();
 
@@ -176,7 +176,7 @@ describe("Module: dashboard", () => {
         await createSessionForSpot(testDb, SPOTS[3].id);
         await createSessionForSpot(testDb, SPOTS[3].id);
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getMostVisited();
 
@@ -210,7 +210,7 @@ describe("Module: dashboard", () => {
         await createSessionForSpot(testDb, SPOTS[1].id, { date: "2026-10-14" });
         await createSessionForSpot(testDb, SPOTS[1].id, { date: "2026-10-15" });
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const notFiltered = await repo.getMostVisited();
         assert.strictEqual(notFiltered.success, true);
@@ -277,11 +277,11 @@ describe("Module: dashboard", () => {
       });
     });
 
-    describe("Best spot by session ratings", () => {
+    describe("Top three spots by session ratings", () => {
       test("should return empty array if there are no sessions", async () => {
         const testDb = getTestDb();
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getBestSpots();
 
@@ -294,7 +294,7 @@ describe("Module: dashboard", () => {
 
         await testDb.delete(spotsTable);
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getBestSpots();
 
@@ -316,7 +316,7 @@ describe("Module: dashboard", () => {
         await createSessionForSpot(testDb, SPOTS[2].id, { rating: 2 });
         await createSessionForSpot(testDb, SPOTS[2].id, { rating: 3 });
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getBestSpots();
 
@@ -351,7 +351,7 @@ describe("Module: dashboard", () => {
         await createSessionForSpot(testDb, SPOTS[0].id, { rating: 10 });
         await createSessionForSpot(testDb, SPOTS[1].id, { rating: 10 });
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const result = await repo.getBestSpots();
 
@@ -406,7 +406,7 @@ describe("Module: dashboard", () => {
           rating: 2,
         });
 
-        const repo = createSpotsDashboardRepository(testDb);
+        const repo = createSpotsStatsRepository(testDb);
 
         const notFiltered = await repo.getBestSpots();
         assert.strictEqual(notFiltered.success, true);
