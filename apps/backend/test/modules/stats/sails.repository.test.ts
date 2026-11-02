@@ -52,6 +52,7 @@ const createSessionForSail = async (
   testDb: TestDb,
   sailId: string,
   date: string = "2026-10-12",
+  rating: number = 10,
 ) => {
   await testDb.insert(sessionsTable).values([
     {
@@ -59,7 +60,7 @@ const createSessionForSail = async (
       spotId: SPOTS[0].id,
       sailId,
       name: `Session ${currentSessionCount++}`,
-      rating: 10,
+      rating,
     },
   ]);
 };
@@ -269,24 +270,191 @@ describe("Module: stats", () => {
     });
 
     describe("Top three sails", () => {
-      test("Should return empty array if there are no sessions", () => {
-        assert.equal(true, false, "Not yet implemented");
+      test("Should return empty array if there are no sessions", async () => {
+        const testDb = getTestDb();
+
+        const repo = createSailsStatsRepository(testDb);
+
+        const result = await repo.getBestSails();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, []);
       });
 
-      test("Should return empty array if there are no sails", () => {
-        assert.equal(true, false, "Not yet implemented");
+      test("Should return empty array if there are no sails", async () => {
+        const testDb = getTestDb();
+
+        await testDb.delete(sailsTable);
+
+        const repo = createSailsStatsRepository(testDb);
+
+        const result = await repo.getBestSails();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, []);
       });
 
-      test("Should return top three sails by session ratings", () => {
-        assert.equal(true, false, "Not yet implemented");
+      test("Should return top three sails by session ratings", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSail(testDb, SAILS[0].id, "2026-10-12", 4);
+        await createSessionForSail(testDb, SAILS[0].id, "2026-10-12", 5);
+
+        await createSessionForSail(testDb, SAILS[1].id, "2026-10-12", 5);
+        await createSessionForSail(testDb, SAILS[1].id, "2026-10-12", 10);
+
+        await createSessionForSail(testDb, SAILS[2].id, "2026-10-12", 6);
+        await createSessionForSail(testDb, SAILS[2].id, "2026-10-12", 1);
+        await createSessionForSail(testDb, SAILS[2].id, "2026-10-12", 2);
+        await createSessionForSail(testDb, SAILS[2].id, "2026-10-12", 3);
+
+        await createSessionForSail(testDb, SAILS[3].id, "2026-10-12", 9);
+
+        const repo = createSailsStatsRepository(testDb);
+
+        const result = await repo.getBestSails();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, [
+          {
+            id: SAILS[3].id,
+            displayName: "Gaastra 13",
+            averageRating: 9,
+            sessionCount: 1,
+          },
+          {
+            id: SAILS[1].id,
+            displayName: "Gaastra 11",
+            averageRating: 7.5,
+            sessionCount: 2,
+          },
+          {
+            id: SAILS[0].id,
+            displayName: "Gaastra 9",
+            averageRating: 4.5,
+            sessionCount: 2,
+          },
+        ]);
       });
 
-      test("Should sort by size ASC as the tie-breaker", () => {
-        assert.equal(true, false, "Not yet implemented");
+      test("Should sort by size ASC as the tie-breaker", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSail(testDb, SAILS[3].id);
+        await createSessionForSail(testDb, SAILS[2].id);
+        await createSessionForSail(testDb, SAILS[0].id);
+        await createSessionForSail(testDb, SAILS[1].id);
+
+        const repo = createSailsStatsRepository(testDb);
+
+        const result = await repo.getBestSails();
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, [
+          {
+            id: SAILS[0].id,
+            displayName: "Gaastra 9",
+            averageRating: 10,
+            sessionCount: 1,
+          },
+          {
+            id: SAILS[1].id,
+            displayName: "Gaastra 11",
+            averageRating: 10,
+            sessionCount: 1,
+          },
+          {
+            id: SAILS[3].id,
+            displayName: "Gaastra 13",
+            averageRating: 10,
+            sessionCount: 1,
+          },
+        ]);
       });
 
-      test("Should filter by date correctly", () => {
-        assert.equal(true, false, "Not yet implemented");
+      test("Should filter by date correctly", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSail(testDb, SAILS[1].id, "2026-10-10", 10);
+        await createSessionForSail(testDb, SAILS[1].id, "2026-10-11", 8);
+        await createSessionForSail(testDb, SAILS[0].id, "2026-10-12", 6);
+        await createSessionForSail(testDb, SAILS[0].id, "2026-10-13", 10);
+        await createSessionForSail(testDb, SAILS[1].id, "2026-10-14", 2);
+        await createSessionForSail(testDb, SAILS[1].id, "2026-10-15", 2);
+
+        const repo = createSailsStatsRepository(testDb);
+
+        const notFiltered = await repo.getBestSails();
+        assert.strictEqual(notFiltered.success, true);
+        assert.deepStrictEqual(notFiltered.data, [
+          {
+            id: SAILS[0].id,
+            displayName: "Gaastra 9",
+            averageRating: 8,
+            sessionCount: 2,
+          },
+          {
+            id: SAILS[1].id,
+            displayName: "Gaastra 11",
+            averageRating: 5.5,
+            sessionCount: 4,
+          },
+        ]);
+
+        const filteredFrom = await repo.getBestSails({ from: "2026-10-13" });
+        assert.strictEqual(filteredFrom.success, true);
+        assert.deepStrictEqual(filteredFrom.data, [
+          {
+            id: SAILS[0].id,
+            displayName: "Gaastra 9",
+            averageRating: 10,
+            sessionCount: 1,
+          },
+          {
+            id: SAILS[1].id,
+            displayName: "Gaastra 11",
+            averageRating: 2,
+            sessionCount: 2,
+          },
+        ]);
+
+        const filteredTo = await repo.getBestSails({ to: "2026-10-13" });
+        assert.strictEqual(filteredTo.success, true);
+        assert.deepStrictEqual(filteredTo.data, [
+          {
+            id: SAILS[1].id,
+            displayName: "Gaastra 11",
+            averageRating: 9,
+            sessionCount: 2,
+          },
+          {
+            id: SAILS[0].id,
+            displayName: "Gaastra 9",
+            averageRating: 8,
+            sessionCount: 2,
+          },
+        ]);
+
+        const filteredFromAndTo = await repo.getBestSails({
+          from: "2026-10-13",
+          to: "2026-10-14",
+        });
+        assert.strictEqual(filteredFromAndTo.success, true);
+        assert.deepStrictEqual(filteredFromAndTo.data, [
+          {
+            id: SAILS[0].id,
+            displayName: "Gaastra 9",
+            averageRating: 10,
+            sessionCount: 1,
+          },
+          {
+            id: SAILS[1].id,
+            displayName: "Gaastra 11",
+            averageRating: 2,
+            sessionCount: 1,
+          },
+        ]);
+      });
     });
   });
 });

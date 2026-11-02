@@ -11,8 +11,8 @@ const fakeGearRepository = {
 
 describe("Module: gear", () => {
   describe("routes", () => {
-    describe("brands", () => {
-      test("GET /gear/brands returns all brands", async (t) => {
+    describe("GET /gear/brands", () => {
+      test("returns all brands", async (t) => {
         const app = await build(t, {
           gearRepository: {
             ...fakeGearRepository,
@@ -41,7 +41,7 @@ describe("Module: gear", () => {
         ]);
       });
 
-      test("GET /gear/brands returns empty array when no brands exist", async (t) => {
+      test("returns empty array when no brands exist", async (t) => {
         const app = await build(t, {
           gearRepository: {
             ...fakeGearRepository,
@@ -57,7 +57,7 @@ describe("Module: gear", () => {
         assert.deepEqual(JSON.parse(res.payload), []);
       });
 
-      test("GET /gear/brands returns 500 on unknown error", async (t) => {
+      test("returns 500 on unknown error", async (t) => {
         const app = await build(t, {
           gearRepository: {
             ...fakeGearRepository,
@@ -78,8 +78,8 @@ describe("Module: gear", () => {
       });
     });
 
-    describe("sails", () => {
-      test("GET /gear/sails returns all sails", async (t) => {
+    describe("GET /gear/sails", () => {
+      test("returns all sails", async (t) => {
         const app = await build(t, {
           gearRepository: {
             ...fakeGearRepository,
@@ -106,7 +106,7 @@ describe("Module: gear", () => {
         ]);
       });
 
-      test("GET /gear/sails returns empty array when no sails exist", async (t) => {
+      test("returns empty array when no sails exist", async (t) => {
         const app = await build(t, {
           gearRepository: {
             ...fakeGearRepository,
@@ -122,7 +122,7 @@ describe("Module: gear", () => {
         assert.deepEqual(JSON.parse(res.payload), []);
       });
 
-      test("GET /gear/sails returns 500 on unknown error", async (t) => {
+      test("returns 500 on unknown error", async (t) => {
         const app = await build(t, {
           gearRepository: {
             ...fakeGearRepository,
