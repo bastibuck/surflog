@@ -3,7 +3,7 @@ import type { FastifyInstance } from "fastify";
 import type z from "zod";
 
 import {
-  GetBestSpotFiltersSchema,
+  type GetBestSpotsFiltersSchema,
   type GetMostVisitedSpotsFiltersSchema,
 } from "@surflog/shared/api-schema/dashboard/DashboardSchema";
 
@@ -54,7 +54,7 @@ const createSpotsDashboardRepository = (db: FastifyInstance["db"]) => {
           .limit(3);
       }),
 
-    getBestSpot: (filters: z.infer<typeof GetBestSpotFiltersSchema> = {}) =>
+    getBestSpots: (filters: z.infer<typeof GetBestSpotsFiltersSchema> = {}) =>
       withDatabaseResult(async () => {
         const sessionCountAndAvgRatingBySpotIdCTE = db
           .$with("spot_ids_to_avg_session_rating")
@@ -79,7 +79,7 @@ const createSpotsDashboardRepository = (db: FastifyInstance["db"]) => {
               .groupBy(sessionsTable.spotId),
           );
 
-        const [bestSpot] = await db
+        return db
           .with(sessionCountAndAvgRatingBySpotIdCTE)
           .select({
             id: spotsTable.id,
@@ -96,9 +96,7 @@ const createSpotsDashboardRepository = (db: FastifyInstance["db"]) => {
             desc(sessionCountAndAvgRatingBySpotIdCTE.averageRating),
             asc(spotsTable.name),
           )
-          .limit(1);
-
-        return bestSpot ?? null;
+          .limit(3);
       }),
   } satisfies Repository;
 };

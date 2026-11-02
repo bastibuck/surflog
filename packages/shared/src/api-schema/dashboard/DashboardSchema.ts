@@ -48,24 +48,25 @@ const GetMostVisitedSpotsResponseSchema = z
 const GetMostVisitedSpotsFiltersSchema = DateFilterSchema;
 
 /**
- * best spot by session ratings
+ * best spots by session ratings
  */
-const GetBestSpotResponseSchema = z
+const GetBestSpotsResponseSchema = z
   .object({
     id: z.uuid(),
     name: z.string(),
     averageRating: z.number().min(1).max(10),
     sessionCount: z.number().positive().int(),
   })
-  .nullable();
+  .array()
+  .max(3);
 
-const GetBestSpotFiltersSchema = DateFilterSchema;
+const GetBestSpotsFiltersSchema = DateFilterSchema;
 
 export {
   GetMostUsedSailsResponseSchema,
   GetMostUsedSailsFiltersSchema,
   GetMostVisitedSpotsResponseSchema,
   GetMostVisitedSpotsFiltersSchema,
-  GetBestSpotResponseSchema,
-  GetBestSpotFiltersSchema,
+  GetBestSpotsResponseSchema,
+  GetBestSpotsFiltersSchema,
 };

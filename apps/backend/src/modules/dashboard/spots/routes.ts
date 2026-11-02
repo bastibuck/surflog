@@ -1,7 +1,7 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
-  GetBestSpotFiltersSchema,
-  GetBestSpotResponseSchema,
+  GetBestSpotsFiltersSchema,
+  GetBestSpotsResponseSchema,
   GetMostVisitedSpotsFiltersSchema,
   GetMostVisitedSpotsResponseSchema,
 } from "@surflog/shared/api-schema/dashboard/DashboardSchema";
@@ -41,13 +41,13 @@ const dashboardSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["dashboard"],
         response: {
-          200: GetBestSpotResponseSchema.describe("Spot with highest ranking"),
+          200: GetBestSpotsResponseSchema.describe("Spot with highest ranking"),
         },
-        querystring: GetBestSpotFiltersSchema,
+        querystring: GetBestSpotsFiltersSchema,
       },
     },
     async function (request, reply) {
-      const result = await fastify.spotsDashboardRepository.getBestSpot(
+      const result = await fastify.spotsDashboardRepository.getBestSpots(
         request.query,
       );
 

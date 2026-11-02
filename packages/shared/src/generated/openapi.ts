@@ -158,7 +158,7 @@ export interface paths {
                             name: string;
                             averageRating: number;
                             sessionCount: number;
-                        } | null;
+                        }[];
                     };
                 };
             };
