@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, asc, avg, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type z from "zod";
 
@@ -7,7 +7,10 @@ import {
   type GetMostVisitedSpotsFiltersSchema,
 } from "@surflog/shared/api-schema/stats/StatsSchema";
 
-import { withDatabaseResult } from "../../../lib/database.ts";
+import {
+  EntityNotFoundError,
+  withDatabaseResult,
+} from "../../../lib/database.ts";
 import type { Repository } from "../../../lib/types/Repository.ts";
 import { sessionsTable } from "../../sessions/models/Session.model.ts";
 import { spotsTable } from "../../spots/models/Spot.model.ts";
@@ -97,6 +100,24 @@ const createSpotsStatsRepository = (db: FastifyInstance["db"]) => {
             asc(spotsTable.name),
           )
           .limit(3);
+      }),
+
+    getAverageSpotRating: (spotId: string) =>
+      withDatabaseResult(async () => {
+        const [spot] = await db
+          .select({
+            averageRating: avg(sessionsTable.rating).mapWith(Number),
+          })
+          .from(spotsTable)
+          .where(eq(spotsTable.id, spotId))
+          .leftJoin(sessionsTable, eq(sessionsTable.spotId, spotsTable.id))
+          .groupBy(spotsTable.id);
+
+        if (spot === undefined) {
+          throw new EntityNotFoundError("spots", spotId);
+        }
+
+        return spot.averageRating;
       }),
   } satisfies Repository;
 };

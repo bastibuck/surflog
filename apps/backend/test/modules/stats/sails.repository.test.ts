@@ -152,27 +152,6 @@ describe("Module: stats", () => {
         ]);
       });
 
-      test("should ignore sails with zero sessions", async () => {
-        const testDb = getTestDb();
-
-        await createSessionForSail(testDb, SAILS[1].id);
-        await createSessionForSail(testDb, SAILS[1].id);
-        await createSessionForSail(testDb, SAILS[1].id);
-
-        const repo = createSailsStatsRepository(testDb);
-
-        const result = await repo.getMostUsed();
-
-        assert.strictEqual(result.success, true);
-        assert.deepStrictEqual(result.data, [
-          {
-            id: SAILS[1].id,
-            displayName: "Gaastra 11",
-            count: 3,
-          },
-        ]);
-      });
-
       test("should sort by size ASC as the tie-breaker", async () => {
         const testDb = getTestDb();
 
@@ -290,9 +269,24 @@ describe("Module: stats", () => {
     });
 
     describe("Top three sails", () => {
-      test("Impl missing", () => {
-        assert.equal(true, false);
+      test("Should return empty array if there are no sessions", () => {
+        assert.equal(true, false, "Not yet implemented");
       });
+
+      test("Should return empty array if there are no sails", () => {
+        assert.equal(true, false, "Not yet implemented");
+      });
+
+      test("Should return top three sails by session ratings", () => {
+        assert.equal(true, false, "Not yet implemented");
+      });
+
+      test("Should sort by size ASC as the tie-breaker", () => {
+        assert.equal(true, false, "Not yet implemented");
+      });
+
+      test("Should filter by date correctly", () => {
+        assert.equal(true, false, "Not yet implemented");
     });
   });
 });

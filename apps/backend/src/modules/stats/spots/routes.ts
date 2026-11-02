@@ -1,10 +1,12 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
+  GetAverageSpotRating,
   GetBestSpotsFiltersSchema,
   GetBestSpotsResponseSchema,
   GetMostVisitedSpotsFiltersSchema,
   GetMostVisitedSpotsResponseSchema,
 } from "@surflog/shared/api-schema/stats/StatsSchema";
+import z from "zod";
 
 const statsSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -55,6 +57,36 @@ const statsSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
 
       if (result.success === false) {
         return reply.internalServerError("Failed to retrieve best spots");
+      }
+
+      return result.data;
+    },
+  );
+
+  fastify.get(
+    "/average-rating/:spotId",
+    {
+      schema: {
+        tags: ["stats"],
+        response: {
+          200: GetAverageSpotRating.describe("Average rating for given spot"),
+        },
+        params: z.object({
+          spotId: z.uuid(),
+        }),
+      },
+    },
+    async function (request, reply) {
+      const result = await fastify.spotsStatsRepository.getAverageSpotRating(
+        request.params.spotId,
+      );
+
+      if (result.success === false && result.error === "NOT_FOUND__spots") {
+        return reply.notFound("Spot not found");
+      }
+
+      if (result.success === false) {
+        return reply.internalServerError("Failed to retrieve spot rating");
       }
 
       return result.data;

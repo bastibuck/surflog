@@ -480,5 +480,51 @@ describe("Module: stats", () => {
         ]);
       });
     });
+
+    describe("Average spot rating", () => {
+      test("Should return null for spot without sessions", async () => {
+        const testDb = getTestDb();
+
+        const repo = createSpotsStatsRepository(testDb);
+
+        const result = await repo.getAverageSpotRating(SPOTS[2].id);
+
+        assert.strictEqual(result.success, true);
+        assert.deepStrictEqual(result.data, null);
+      });
+
+      test("Should return entity not found error for unknown spot", async () => {
+        const testDb = getTestDb();
+
+        const repo = createSpotsStatsRepository(testDb);
+
+        const result = await repo.getAverageSpotRating(
+          "756a54fd-c0e3-4a1d-8056-210b6c0d34c2", // unknown UUID
+        );
+
+        assert.strictEqual(result.success, false);
+        assert.deepStrictEqual(result.error, "NOT_FOUND__spots");
+      });
+
+      test("Should return correct average spot rating", async () => {
+        const testDb = getTestDb();
+
+        await createSessionForSpot(testDb, SPOTS[0].id, { rating: 5 });
+        await createSessionForSpot(testDb, SPOTS[0].id, { rating: 10 });
+        await createSessionForSpot(testDb, SPOTS[1].id, { rating: 1 });
+
+        const repo = createSpotsStatsRepository(testDb);
+
+        const spotZero = await repo.getAverageSpotRating(SPOTS[0].id);
+
+        assert.strictEqual(spotZero.success, true);
+        assert.deepStrictEqual(spotZero.data, 7.5);
+
+        const spotOne = await repo.getAverageSpotRating(SPOTS[1].id);
+
+        assert.strictEqual(spotOne.success, true);
+        assert.deepStrictEqual(spotOne.data, 1);
+      });
+    });
   });
 });

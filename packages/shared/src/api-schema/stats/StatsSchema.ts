@@ -74,6 +74,8 @@ const GetBestSpotsResponseSchema = z
 
 const GetBestSpotsFiltersSchema = DateFilterSchema;
 
+const GetAverageSpotRating = z.number().min(1).max(10).nullable();
+
 export {
   GetMostUsedSailsResponseSchema,
   GetMostUsedSailsFiltersSchema,
@@ -83,4 +85,5 @@ export {
   GetMostVisitedSpotsFiltersSchema,
   GetBestSpotsResponseSchema,
   GetBestSpotsFiltersSchema,
+  GetAverageSpotRating,
 };
