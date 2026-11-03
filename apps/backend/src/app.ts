@@ -13,6 +13,8 @@ import docsPlugin from "./plugins/_/docs.ts";
 import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
 import type { GearPluginOptions } from "./modules/gear/index.ts";
 import type { SpotsPluginOptions } from "./modules/spots/index.ts";
+import type { SailsStatsPluginOptions } from "./modules/stats/sails/index.ts";
+import type { SpotsStatsPluginOptions } from "./modules/stats/spots/index.ts";
 
 export interface AppOptions
   extends
@@ -20,7 +22,9 @@ export interface AppOptions
     Partial<AutoloadPluginOptions>,
     SessionsPluginOptions,
     GearPluginOptions,
-    SpotsPluginOptions {}
+    SpotsPluginOptions,
+    SailsStatsPluginOptions,
+    SpotsStatsPluginOptions {}
 
 const appDirectory = dirname(fileURLToPath(import.meta.url));
 
