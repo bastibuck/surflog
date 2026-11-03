@@ -20,8 +20,10 @@ const DateFilterSchema = z
   });
 
 /**
- * most used sails
+ * Sails
  */
+
+const GetMostUsedSailsFiltersSchema = DateFilterSchema;
 const GetMostUsedSailsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -31,8 +33,7 @@ const GetMostUsedSailsResponseSchema = z
   .array()
   .max(3);
 
-const GetMostUsedSailsFiltersSchema = DateFilterSchema;
-
+const GetBestSailsFiltersSchema = DateFilterSchema;
 const GetBestSailsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -43,11 +44,11 @@ const GetBestSailsResponseSchema = z
   .array()
   .max(3);
 
-const GetBestSailsFiltersSchema = DateFilterSchema;
-
 /**
- * most visited spots
+ * Spots
  */
+
+const GetMostVisitedSpotsFiltersSchema = DateFilterSchema;
 const GetMostVisitedSpotsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -57,11 +58,7 @@ const GetMostVisitedSpotsResponseSchema = z
   .array()
   .max(3);
 
-const GetMostVisitedSpotsFiltersSchema = DateFilterSchema;
-
-/**
- * best spots by session ratings
- */
+const GetBestSpotsFiltersSchema = DateFilterSchema;
 const GetBestSpotsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -72,9 +69,7 @@ const GetBestSpotsResponseSchema = z
   .array()
   .max(3);
 
-const GetBestSpotsFiltersSchema = DateFilterSchema;
-
-const GetAverageSpotRating = z.number().min(1).max(10).nullable();
+const GetAverageSpotRatingResponseSchema = z.number().min(1).max(10).nullable();
 
 export {
   GetMostUsedSailsResponseSchema,
@@ -85,5 +80,5 @@ export {
   GetMostVisitedSpotsFiltersSchema,
   GetBestSpotsResponseSchema,
   GetBestSpotsFiltersSchema,
-  GetAverageSpotRating,
+  GetAverageSpotRatingResponseSchema,
 };
