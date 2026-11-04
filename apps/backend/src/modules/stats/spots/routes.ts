@@ -1,6 +1,6 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
-  GetAverageSpotRating,
+  GetAverageSpotRatingResponseSchema,
   GetBestSpotsFiltersSchema,
   GetBestSpotsResponseSchema,
   GetMostVisitedSpotsFiltersSchema,
@@ -69,7 +69,9 @@ const statsSpotsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         tags: ["stats"],
         response: {
-          200: GetAverageSpotRating.describe("Average rating for given spot"),
+          200: GetAverageSpotRatingResponseSchema.describe(
+            "Average rating for given spot",
+          ),
         },
         params: z.object({
           spotId: z.uuid(),

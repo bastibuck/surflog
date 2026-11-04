@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GetSessionResponseSchema } from "../sessions/SessionSchema.ts";
 
 // generic
 const DateFilterSchema = z
@@ -20,8 +21,10 @@ const DateFilterSchema = z
   });
 
 /**
- * most used sails
+ * Sails
  */
+
+const GetMostUsedSailsFiltersSchema = DateFilterSchema;
 const GetMostUsedSailsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -31,8 +34,7 @@ const GetMostUsedSailsResponseSchema = z
   .array()
   .max(3);
 
-const GetMostUsedSailsFiltersSchema = DateFilterSchema;
-
+const GetBestSailsFiltersSchema = DateFilterSchema;
 const GetBestSailsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -43,11 +45,11 @@ const GetBestSailsResponseSchema = z
   .array()
   .max(3);
 
-const GetBestSailsFiltersSchema = DateFilterSchema;
-
 /**
- * most visited spots
+ * Spots
  */
+
+const GetMostVisitedSpotsFiltersSchema = DateFilterSchema;
 const GetMostVisitedSpotsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -57,11 +59,7 @@ const GetMostVisitedSpotsResponseSchema = z
   .array()
   .max(3);
 
-const GetMostVisitedSpotsFiltersSchema = DateFilterSchema;
-
-/**
- * best spots by session ratings
- */
+const GetBestSpotsFiltersSchema = DateFilterSchema;
 const GetBestSpotsResponseSchema = z
   .object({
     id: z.uuid(),
@@ -72,9 +70,24 @@ const GetBestSpotsResponseSchema = z
   .array()
   .max(3);
 
-const GetBestSpotsFiltersSchema = DateFilterSchema;
+const GetAverageSpotRatingResponseSchema = z.number().min(1).max(10).nullable();
 
-const GetAverageSpotRating = z.number().min(1).max(10).nullable();
+/**
+ * Sessions
+ */
+
+const GetSessionsCountFilterSchema = DateFilterSchema;
+const GetSessionsCountResponseSchema = z.number().nonnegative().int();
+
+const GetSessionsAverageRatingFilterSchema = DateFilterSchema;
+const GetSessionsAverageRatingResponseSchema = z
+  .number()
+  .min(1)
+  .max(10)
+  .nullable();
+
+const GetBestSessionFilterSchema = DateFilterSchema;
+const GetBestSessionResponseSchema = GetSessionResponseSchema.nullable();
 
 export {
   GetMostUsedSailsResponseSchema,
@@ -85,5 +98,11 @@ export {
   GetMostVisitedSpotsFiltersSchema,
   GetBestSpotsResponseSchema,
   GetBestSpotsFiltersSchema,
-  GetAverageSpotRating,
+  GetAverageSpotRatingResponseSchema,
+  GetSessionsCountFilterSchema,
+  GetSessionsCountResponseSchema,
+  GetSessionsAverageRatingFilterSchema,
+  GetSessionsAverageRatingResponseSchema,
+  GetBestSessionFilterSchema,
+  GetBestSessionResponseSchema,
 };

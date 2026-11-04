@@ -14,6 +14,7 @@ import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
 import type { GearPluginOptions } from "./modules/gear/index.ts";
 import type { SpotsPluginOptions } from "./modules/spots/index.ts";
 import type { SailsStatsPluginOptions } from "./modules/stats/sails/index.ts";
+import type { SessionsStatsPluginOptions } from "./modules/stats/sessions/index.ts";
 import type { SpotsStatsPluginOptions } from "./modules/stats/spots/index.ts";
 
 export interface AppOptions
@@ -24,6 +25,7 @@ export interface AppOptions
     GearPluginOptions,
     SpotsPluginOptions,
     SailsStatsPluginOptions,
+    SessionsStatsPluginOptions,
     SpotsStatsPluginOptions {}
 
 const appDirectory = dirname(fileURLToPath(import.meta.url));
