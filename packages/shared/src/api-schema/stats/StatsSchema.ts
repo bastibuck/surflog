@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GetSessionResponseSchema } from "../sessions/SessionSchema.ts";
 
 // generic
 const DateFilterSchema = z
@@ -78,6 +79,16 @@ const GetAverageSpotRatingResponseSchema = z.number().min(1).max(10).nullable();
 const GetSessionsCountFilterSchema = DateFilterSchema;
 const GetSessionsCountResponseSchema = z.number().nonnegative().int();
 
+const GetSessionsAverageRatingFilterSchema = DateFilterSchema;
+const GetSessionsAverageRatingResponseSchema = z
+  .number()
+  .min(1)
+  .max(10)
+  .nullable();
+
+const GetBestSessionFilterSchema = DateFilterSchema;
+const GetBestSessionResponseSchema = GetSessionResponseSchema.nullable();
+
 export {
   GetMostUsedSailsResponseSchema,
   GetMostUsedSailsFiltersSchema,
@@ -90,4 +101,8 @@ export {
   GetAverageSpotRatingResponseSchema,
   GetSessionsCountFilterSchema,
   GetSessionsCountResponseSchema,
+  GetSessionsAverageRatingFilterSchema,
+  GetSessionsAverageRatingResponseSchema,
+  GetBestSessionFilterSchema,
+  GetBestSessionResponseSchema,
 };
