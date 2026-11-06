@@ -34,7 +34,7 @@ const SAILS = [
   },
   {
     id: "8b3d0e59-0507-4c86-bce5-0142ac41cafa",
-    size: 13,
+    size: 13.5,
     brandId: BRANDS[0].id,
     alias: null,
   },
@@ -137,7 +137,7 @@ describe("Module: stats", () => {
         assert.deepStrictEqual(result.data, [
           {
             id: SAILS[3].id,
-            displayName: "Gaastra 13",
+            displayName: "Gaastra 13.5",
             count: 5,
           },
           {
@@ -186,7 +186,7 @@ describe("Module: stats", () => {
           },
           {
             id: SAILS[3].id,
-            displayName: "Gaastra 13",
+            displayName: "Gaastra 13.5",
             count: 2,
           },
         ]);
@@ -318,7 +318,7 @@ describe("Module: stats", () => {
         assert.deepStrictEqual(result.data, [
           {
             id: SAILS[3].id,
-            displayName: "Gaastra 13",
+            displayName: "Gaastra 13.5",
             averageRating: 9,
             sessionCount: 1,
           },
@@ -365,7 +365,7 @@ describe("Module: stats", () => {
           },
           {
             id: SAILS[3].id,
-            displayName: "Gaastra 13",
+            displayName: "Gaastra 13.5",
             averageRating: 10,
             sessionCount: 1,
           },

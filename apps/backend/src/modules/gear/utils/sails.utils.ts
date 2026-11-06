@@ -5,7 +5,7 @@ import { sailsTable } from "../models/Sail.model.ts";
 export const sailsDisplayNameSql = sql<string>`
   concat_ws(
     ' | ',
-    concat(${brandsTable.name}, ' ', ${sailsTable.size}),
+    concat(${brandsTable.name}, ' ', trim_scale(${sailsTable.size})),
     ${sailsTable.alias}
   )
 `.as("display_name");

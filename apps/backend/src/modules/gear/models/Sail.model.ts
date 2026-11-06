@@ -1,6 +1,6 @@
 import {
   check,
-  integer,
+  numeric,
   pgTable,
   uniqueIndex,
   uuid,
@@ -13,7 +13,7 @@ export const sailsTable = pgTable(
   "sails",
   {
     id: uuid().primaryKey().defaultRandom().notNull(),
-    size: integer().notNull(),
+    size: numeric("size", { precision: 3, scale: 1, mode: "number" }).notNull(),
     alias: varchar({ length: 30 }),
 
     // relations

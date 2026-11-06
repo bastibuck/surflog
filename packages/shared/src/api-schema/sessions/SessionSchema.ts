@@ -10,7 +10,7 @@ const SessionBaseSchema = z.object({
     name: z.string().max(50).nonempty(),
   }),
   sail: z.object({
-    size: z.number().int().positive(),
+    size: z.number().positive(),
     alias: z.string().max(30).nullable(),
     brand: z.string().max(100).nonempty(),
   }),

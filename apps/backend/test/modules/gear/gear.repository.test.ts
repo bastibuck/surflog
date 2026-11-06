@@ -53,6 +53,7 @@ describe("Module: gear", () => {
         { brandId: gaastraBrand[0].id, size: 7, alias: "My alias" },
         { brandId: duotoneBrand[0].id, size: 9 },
         { brandId: gaastraBrand[0].id, size: 7, alias: "Custom alias" },
+        { brandId: duotoneBrand[0].id, size: 5.3, alias: "Wave" },
       ]);
 
       const repo = createGearRepository(testDb);
@@ -60,11 +61,12 @@ describe("Module: gear", () => {
       const sails = await repo.listSails();
 
       assert.strictEqual(sails.success, true);
-      assert.strictEqual(sails.data.length, 4);
-      assert.strictEqual(sails.data[0].displayName, "Duotone 9");
-      assert.strictEqual(sails.data[1].displayName, "Gaastra 7 | Custom alias");
-      assert.strictEqual(sails.data[2].displayName, "Gaastra 7 | My alias");
-      assert.strictEqual(sails.data[3].displayName, "Gaastra 9");
+      assert.strictEqual(sails.data.length, 5);
+      assert.strictEqual(sails.data[0].displayName, "Duotone 5.3 | Wave");
+      assert.strictEqual(sails.data[1].displayName, "Duotone 9");
+      assert.strictEqual(sails.data[2].displayName, "Gaastra 7 | Custom alias");
+      assert.strictEqual(sails.data[3].displayName, "Gaastra 7 | My alias");
+      assert.strictEqual(sails.data[4].displayName, "Gaastra 9");
     });
   });
 });
