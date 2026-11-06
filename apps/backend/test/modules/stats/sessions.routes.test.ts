@@ -11,8 +11,8 @@ const BEST_SESSION = {
   date: "2026-10-12",
   rating: 10,
   notes: null,
-  spot: { name: "Kloster" },
-  sail: { size: 9, alias: null, brand: "Gaastra" },
+  spot: "Kloster",
+  sail: "Gaastra 9",
 };
 
 const fakeSessionsStatsRepository = {

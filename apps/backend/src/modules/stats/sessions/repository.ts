@@ -1,4 +1,4 @@
-import { and, avg, count, gte, lte } from "drizzle-orm";
+import { and, avg, count, desc, eq, gte, lte } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type { z } from "zod";
 
@@ -10,6 +10,10 @@ import {
   GetSessionsAverageRatingFilterSchema,
   GetSessionsCountFilterSchema,
 } from "@surflog/shared/api-schema/stats/StatsSchema";
+import { spotsTable } from "../../spots/models/Spot.model.ts";
+import { sailsDisplayNameSql } from "../../gear/utils/sails.utils.ts";
+import { sailsTable } from "../../gear/models/Sail.model.ts";
+import { brandsTable } from "../../gear/models/Brand.model.ts";
 
 const createSessionsStatsRepository = (db: FastifyInstance["db"]) => {
   return {
@@ -49,56 +53,34 @@ const createSessionsStatsRepository = (db: FastifyInstance["db"]) => {
       filters: z.infer<typeof GetBestSessionFilterSchema> = {},
     ) =>
       withDatabaseResult(async () => {
-        const session = await db.query.sessions.findFirst({
-          columns: {
-            id: true,
-            name: true,
-            date: true,
-            rating: true,
-            notes: true,
-          },
-          where: {
-            date: {
-              gte: filters.from,
-              lte: filters.to,
-            },
-          },
-          orderBy: {
-            rating: "desc",
-          },
-          with: {
-            spot: {
-              columns: {
-                name: true,
-              },
-            },
-            sail: {
-              columns: {
-                size: true,
-                alias: true,
-              },
-              with: {
-                brand: {
-                  columns: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+        const [session] = await db
+          .select({
+            id: sessionsTable.id,
+            name: sessionsTable.name,
+            date: sessionsTable.date,
+            rating: sessionsTable.rating,
+            notes: sessionsTable.notes,
+            spot: spotsTable.name,
+            sail: sailsDisplayNameSql,
+          })
+          .from(sessionsTable)
+          .where(
+            and(
+              filters.from ? gte(sessionsTable.date, filters.from) : undefined,
+              filters.to ? lte(sessionsTable.date, filters.to) : undefined,
+            ),
+          )
+          .innerJoin(spotsTable, eq(sessionsTable.spotId, spotsTable.id))
+          .innerJoin(sailsTable, eq(sessionsTable.sailId, sailsTable.id))
+          .innerJoin(brandsTable, eq(sailsTable.brandId, brandsTable.id))
+          .orderBy(desc(sessionsTable.rating))
+          .limit(1);
 
         if (session === undefined) {
           return null;
         }
 
-        return {
-          ...session,
-          sail: {
-            ...session.sail,
-            brand: session.sail.brand.name,
-          },
-        };
+        return session;
       }),
   } satisfies Repository;
 };

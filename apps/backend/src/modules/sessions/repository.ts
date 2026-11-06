@@ -9,6 +9,7 @@ import { sailsTable } from "../gear/models/Sail.model.ts";
 import { spotsTable } from "../spots/models/Spot.model.ts";
 import { sessionsTable } from "./models/Session.model.ts";
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { sailsDisplayNameSql } from "../gear/utils/sails.utils.ts";
 
 const createSessionsRepository = (db: FastifyInstance["db"]) => {
   return {
@@ -28,50 +29,28 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
 
     findById: (id: string) =>
       withDatabaseResult(async () => {
-        const session = await db.query.sessions.findFirst({
-          columns: {
-            id: true,
-            name: true,
-            date: true,
-            rating: true,
-            notes: true,
-          },
-          where: {
-            id,
-          },
-          with: {
-            spot: {
-              columns: {
-                name: true,
-              },
-            },
-            sail: {
-              columns: {
-                size: true,
-                alias: true,
-              },
-              with: {
-                brand: {
-                  columns: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+        const [session] = await db
+          .select({
+            id: sessionsTable.id,
+            name: sessionsTable.name,
+            date: sessionsTable.date,
+            rating: sessionsTable.rating,
+            notes: sessionsTable.notes,
+            spot: spotsTable.name,
+            sail: sailsDisplayNameSql,
+          })
+          .from(sessionsTable)
+          .where(eq(sessionsTable.id, id))
+          .innerJoin(spotsTable, eq(sessionsTable.spotId, spotsTable.id))
+          .innerJoin(sailsTable, eq(sessionsTable.sailId, sailsTable.id))
+          .innerJoin(brandsTable, eq(sailsTable.brandId, brandsTable.id))
+          .limit(1);
 
         if (session === undefined) {
           throw new EntityNotFoundError("sessions", id);
         }
 
-        return {
-          ...session,
-          sail: {
-            ...session.sail,
-            brand: session.sail.brand.name,
-          },
-        };
+        return session;
       }),
 
     create: (session: CreateSessionPayload) =>

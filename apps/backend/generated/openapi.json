@@ -444,49 +444,12 @@
                       ]
                     },
                     "spot": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 50
-                        }
-                      },
-                      "required": [
-                        "name"
-                      ],
-                      "additionalProperties": false
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
                     },
                     "sail": {
-                      "type": "object",
-                      "properties": {
-                        "size": {
-                          "type": "number",
-                          "exclusiveMinimum": 0
-                        },
-                        "alias": {
-                          "anyOf": [
-                            {
-                              "type": "string",
-                              "maxLength": 30
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "brand": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 100
-                        }
-                      },
-                      "required": [
-                        "size",
-                        "alias",
-                        "brand"
-                      ],
-                      "additionalProperties": false
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -873,49 +836,12 @@
                           ]
                         },
                         "spot": {
-                          "type": "object",
-                          "properties": {
-                            "name": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 50
-                            }
-                          },
-                          "required": [
-                            "name"
-                          ],
-                          "additionalProperties": false
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 50
                         },
                         "sail": {
-                          "type": "object",
-                          "properties": {
-                            "size": {
-                              "type": "number",
-                              "exclusiveMinimum": 0
-                            },
-                            "alias": {
-                              "anyOf": [
-                                {
-                                  "type": "string",
-                                  "maxLength": 30
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
-                            },
-                            "brand": {
-                              "type": "string",
-                              "minLength": 1,
-                              "maxLength": 100
-                            }
-                          },
-                          "required": [
-                            "size",
-                            "alias",
-                            "brand"
-                          ],
-                          "additionalProperties": false
+                          "type": "string"
                         }
                       },
                       "required": [

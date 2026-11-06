@@ -255,14 +255,8 @@ export interface paths {
                             date: string;
                             rating: number;
                             notes: string | null;
-                            spot: {
-                                name: string;
-                            };
-                            sail: {
-                                size: number;
-                                alias: string | null;
-                                brand: string;
-                            };
+                            spot: string;
+                            sail: string;
                         };
                     };
                 };
@@ -530,14 +524,8 @@ export interface paths {
                             date: string;
                             rating: number;
                             notes: string | null;
-                            spot: {
-                                name: string;
-                            };
-                            sail: {
-                                size: number;
-                                alias: string | null;
-                                brand: string;
-                            };
+                            spot: string;
+                            sail: string;
                         } | null;
                     };
                 };

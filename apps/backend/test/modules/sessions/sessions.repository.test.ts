@@ -132,14 +132,8 @@ describe("Module: sessions", () => {
       assert.strictEqual(session.data.date, "2026-10-12");
       assert.strictEqual(session.data.notes, null);
       assert.strictEqual(session.data.rating, 10);
-      assert.deepEqual(session.data.spot, {
-        name: SPOTS[0].name,
-      });
-      assert.deepEqual(session.data.sail, {
-        size: SAILS[0].size,
-        brand: BRANDS[1].name,
-        alias: null,
-      });
+      assert.deepEqual(session.data.spot, SPOTS[0].name);
+      assert.deepEqual(session.data.sail, "Duotone 9");
     });
 
     test("should return an error if session does not exist", async () => {

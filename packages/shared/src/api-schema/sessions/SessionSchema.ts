@@ -6,14 +6,8 @@ const SessionBaseSchema = z.object({
   date: z.iso.date(),
   rating: z.number().int().min(1).max(10),
   notes: z.string().max(500).nullable(),
-  spot: z.object({
-    name: z.string().max(50).nonempty(),
-  }),
-  sail: z.object({
-    size: z.number().positive(),
-    alias: z.string().max(30).nullable(),
-    brand: z.string().max(100).nonempty(),
-  }),
+  spot: z.string().max(50).nonempty(),
+  sail: z.string(),
 });
 
 const GetSessionsListResponseSchema = SessionBaseSchema.pick({

@@ -13,14 +13,8 @@ const fakeSessionsRepository = {
       date: "2024-06-03",
       rating: 1,
       notes: null,
-      spot: {
-        name: "Spot Name",
-      },
-      sail: {
-        size: 5,
-        alias: "Sail Alias",
-        brand: "Some Brand",
-      },
+      spot: "Spot Name",
+      sail: "Some Brand 5 | Sail Alias",
     }),
   create: async (_session) =>
     success({ id: "7561179f-9760-4ac2-838b-67ee08225a13" }),
@@ -125,14 +119,8 @@ describe("Module: sessions", () => {
           date: "2024-06-03",
           rating: 1,
           notes: null,
-          spot: {
-            name: "Spot Name",
-          },
-          sail: {
-            size: 5,
-            alias: "Sail Alias",
-            brand: "Some Brand",
-          },
+          spot: "Spot Name",
+          sail: "Some Brand 5 | Sail Alias",
         });
       });
 
