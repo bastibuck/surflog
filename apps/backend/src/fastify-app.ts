@@ -8,6 +8,9 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import type {} from "./plugins/database/index.ts";
+import type {} from "./plugins/sensible.ts";
+
 import envPlugin from "./plugins/_/env.ts";
 import docsPlugin from "./plugins/_/docs.ts";
 import type { SessionsPluginOptions } from "./modules/sessions/index.ts";

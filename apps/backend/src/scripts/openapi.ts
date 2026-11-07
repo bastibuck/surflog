@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import app from "../app.ts";
+import app from "../fastify-app.ts";
 
 const fastify = Fastify({ logger: false });
 

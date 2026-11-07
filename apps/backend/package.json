@@ -4,11 +4,11 @@
   "scripts": {
     "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test \"test/**/*.test.ts\"",
     "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
-    "start": "pnpm run build && fastify start -l info dist/app.js",
+    "start": "pnpm run build && fastify start -l info dist/fastify-app.js",
     "build": "pnpm --filter @surflog/shared build && pnpm run clean && tsc",
     "watch": "tsc -w",
     "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"Shared,TypeScript,App\" -c \"green.bold,yellow.bold,cyan.bold\" \"pnpm --filter @surflog/shared run dev:watch\" \"pnpm run watch\" \"pnpm run dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ --follow-watch=../.. -w -l info -P dist/app.js",
+    "dev:start": "fastify start --ignore-watch=.ts$ --follow-watch=../.. -w -l info -P dist/fastify-app.js",
     "db:start": "(supabase status >/dev/null 2>&1 || supabase start)",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
