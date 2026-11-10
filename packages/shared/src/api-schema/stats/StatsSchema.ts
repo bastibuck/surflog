@@ -89,6 +89,12 @@ const GetSessionsAverageRatingResponseSchema = z
 const GetBestSessionFilterSchema = DateFilterSchema;
 const GetBestSessionResponseSchema = GetSessionResponseSchema.nullable();
 
+const GetDaysSinceLastSessionResponseSchema = z
+  .number()
+  .nonnegative()
+  .int()
+  .nullable();
+
 export {
   GetMostUsedSailsResponseSchema,
   GetMostUsedSailsFiltersSchema,
@@ -105,4 +111,5 @@ export {
   GetSessionsAverageRatingResponseSchema,
   GetBestSessionFilterSchema,
   GetBestSessionResponseSchema,
+  GetDaysSinceLastSessionResponseSchema,
 };

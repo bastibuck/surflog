@@ -237,4 +237,45 @@ describe("Module: stats sessions repository", () => {
       assert.strictEqual(filteredTo.data?.rating, 9);
     });
   });
+
+  describe("Days since last session", () => {
+    test("Should return null if no sessions exist", async () => {
+      const testDb = getTestDb();
+
+      const repo = createSessionsStatsRepository(testDb);
+
+      const result = await repo.getDaysSinceLastSession();
+      assert.strictEqual(result.success, true);
+      assert.strictEqual(result.data, null);
+    });
+
+    test("Should return days since last session", async () => {
+      const testDb = getTestDb();
+
+      const today = new Date();
+
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+      const threeDaysAgo = new Date(today);
+      threeDaysAgo.setDate(today.getDate() - 3);
+      const fiveDaysAgo = new Date(today);
+      fiveDaysAgo.setDate(today.getDate() - 5);
+
+      await createSession(testDb, {
+        date: sevenDaysAgo.toISOString(),
+      });
+      await createSession(testDb, {
+        date: fiveDaysAgo.toISOString(),
+      });
+      await createSession(testDb, {
+        date: threeDaysAgo.toISOString(),
+      });
+
+      const repo = createSessionsStatsRepository(testDb);
+
+      const result = await repo.getDaysSinceLastSession();
+      assert.strictEqual(result.success, true);
+      assert.strictEqual(result.data, 3);
+    });
+  });
 });

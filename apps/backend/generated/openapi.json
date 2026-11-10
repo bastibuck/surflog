@@ -867,6 +867,35 @@
         }
       }
     },
+    "/stats/sessions/days-since-last": {
+      "get": {
+        "tags": [
+          "stats"
+        ],
+        "responses": {
+          "200": {
+            "description": "Days since last session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Days since last session"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/stats/spots/most-visited": {
       "get": {
         "tags": [

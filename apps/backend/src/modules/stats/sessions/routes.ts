@@ -2,6 +2,7 @@ import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import {
   GetBestSessionFilterSchema,
   GetBestSessionResponseSchema,
+  GetDaysSinceLastSessionResponseSchema,
   GetSessionsAverageRatingFilterSchema,
   GetSessionsAverageRatingResponseSchema,
   GetSessionsCountFilterSchema,
@@ -81,6 +82,32 @@ const statsSessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
 
       if (result.success === false) {
         return reply.internalServerError("Failed to retrieve best session");
+      }
+
+      return result.data;
+    },
+  );
+
+  fastify.get(
+    "/days-since-last",
+    {
+      schema: {
+        tags: ["stats"],
+        response: {
+          200: GetDaysSinceLastSessionResponseSchema.describe(
+            "Days since last session",
+          ),
+        },
+      },
+    },
+    async function (request, reply) {
+      const result =
+        await fastify.sessionsStatsRepository.getDaysSinceLastSession();
+
+      if (result.success === false) {
+        return reply.internalServerError(
+          "Failed to retrieve days since last session",
+        );
       }
 
       return result.data;

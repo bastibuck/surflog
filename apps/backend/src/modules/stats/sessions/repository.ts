@@ -1,4 +1,4 @@
-import { and, avg, count, desc, eq, gte, lte } from "drizzle-orm";
+import { and, avg, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type { z } from "zod";
 
@@ -81,6 +81,20 @@ const createSessionsStatsRepository = (db: FastifyInstance["db"]) => {
         }
 
         return session;
+      }),
+
+    getDaysSinceLastSession: () =>
+      withDatabaseResult(async () => {
+        const [result] = await db
+          .select({
+            daysSinceLastSession:
+              sql`CURRENT_DATE - MAX(${sessionsTable.date})`.mapWith((days) => {
+                return days === null ? null : Number(days);
+              }),
+          })
+          .from(sessionsTable);
+
+        return result.daysSinceLastSession;
       }),
   } satisfies Repository;
 };
