@@ -20,6 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
+          node-version-file: "package.json"
           cache: "pnpm"
 
       - run: pnpm -r i --frozen-lockfile
