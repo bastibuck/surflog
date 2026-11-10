@@ -19,6 +19,7 @@ const fakeSessionsStatsRepository = {
   getCount: async () => success(0),
   getAverageRating: async () => success(null),
   getBestSession: async () => success(null),
+  getDaysSinceLastSession: async () => success(null),
 } satisfies SessionsStatsRepository;
 
 describe("Module: stats sessions routes", () => {
@@ -161,6 +162,44 @@ describe("Module: stats sessions routes", () => {
       assert.equal(
         JSON.parse(res.payload).message,
         "Failed to retrieve best session",
+      );
+    });
+  });
+
+  describe("GET /stats/sessions/days-since-last-session", () => {
+    test("returns the number of days since the last session", async (t) => {
+      const app = await build(t, {
+        sessionsStatsRepository: {
+          ...fakeSessionsStatsRepository,
+          getDaysSinceLastSession: async () => success(5),
+        },
+      });
+
+      const res = await app.inject({
+        url: "/stats/sessions/days-since-last",
+      });
+
+      assert.equal(res.statusCode, 200);
+      assert.deepEqual(JSON.parse(res.payload), 5);
+    });
+
+    test("returns 500 on repository error", async (t) => {
+      const app = await build(t, {
+        sessionsStatsRepository: {
+          ...fakeSessionsStatsRepository,
+          // @ts-expect-error unsupported return type to simulate an unknown error
+          getDaysSinceLastSession: async () => failure("UNKNOWN"),
+        },
+      });
+
+      const res = await app.inject({
+        url: "/stats/sessions/days-since-last",
+      });
+
+      assert.equal(res.statusCode, 500);
+      assert.equal(
+        JSON.parse(res.payload).message,
+        "Failed to retrieve days since last session",
       );
     });
   });

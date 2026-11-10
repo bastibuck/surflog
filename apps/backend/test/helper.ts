@@ -9,7 +9,7 @@ import {
 } from "@testcontainers/postgresql";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { readdir, readFile } from "node:fs/promises";
-import type { AppOptions } from "../src/app.ts";
+import type { AppOptions } from "../src/fastify-app.ts";
 import { relations } from "../src/plugins/database/schema.ts";
 
 export type TestContext = {
@@ -20,7 +20,7 @@ const AppPath = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
   "src",
-  "app.ts",
+  "fastify-app.ts",
 );
 
 // Fill in this config with all the configurations
