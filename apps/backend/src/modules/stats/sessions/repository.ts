@@ -11,9 +11,6 @@ import {
   GetSessionsCountFilterSchema,
 } from "@surflog/shared/api-schema/stats/StatsSchema";
 import { spotsTable } from "../../spots/models/Spot.model.ts";
-import { sailsDisplayNameSql } from "../../gear/utils/sails.utils.ts";
-import { sailsTable } from "../../gear/models/Sail.model.ts";
-import { brandsTable } from "../../gear/models/Brand.model.ts";
 
 const createSessionsStatsRepository = (db: FastifyInstance["db"]) => {
   return {
@@ -59,9 +56,7 @@ const createSessionsStatsRepository = (db: FastifyInstance["db"]) => {
             name: sessionsTable.name,
             date: sessionsTable.date,
             rating: sessionsTable.rating,
-            notes: sessionsTable.notes,
             spot: spotsTable.name,
-            sail: sailsDisplayNameSql,
           })
           .from(sessionsTable)
           .where(
@@ -71,8 +66,6 @@ const createSessionsStatsRepository = (db: FastifyInstance["db"]) => {
             ),
           )
           .innerJoin(spotsTable, eq(sessionsTable.spotId, spotsTable.id))
-          .innerJoin(sailsTable, eq(sessionsTable.sailId, sailsTable.id))
-          .innerJoin(brandsTable, eq(sailsTable.brandId, brandsTable.id))
           .orderBy(desc(sessionsTable.rating))
           .limit(1);
 

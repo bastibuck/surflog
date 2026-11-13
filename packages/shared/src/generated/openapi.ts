@@ -257,6 +257,8 @@ export interface paths {
                             notes: string | null;
                             spot: string;
                             sail: string;
+                            /** @description Share token preview if available and not expired */
+                            shareTokenPreview: string | null;
                         };
                     };
                 };
@@ -523,9 +525,7 @@ export interface paths {
                             /** Format: date */
                             date: string;
                             rating: number;
-                            notes: string | null;
                             spot: string;
-                            sail: string;
                         } | null;
                     };
                 };

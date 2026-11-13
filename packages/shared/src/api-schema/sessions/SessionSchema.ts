@@ -8,6 +8,11 @@ const SessionBaseSchema = z.object({
   notes: z.string().max(500).nullable(),
   spot: z.string().max(50).nonempty(),
   sail: z.string(),
+  shareTokenPreview: z
+    .string()
+    .length(11)
+    .nullable()
+    .describe("Share token preview if available and not expired"),
 });
 
 const GetSessionsListResponseSchema = SessionBaseSchema.pick({
@@ -57,6 +62,7 @@ const CreateSessionPayloadSchema = SessionBaseSchema.omit({
   id: true,
   spot: true,
   sail: true,
+  shareTokenPreview: true,
 }).extend({
   spot: SpotSelectionSchema,
   sail: SailSelectionSchema,
@@ -67,6 +73,7 @@ const CreateSessionResponseSchema = SessionBaseSchema.pick({
 });
 
 export {
+  SessionBaseSchema,
   GetSessionsListResponseSchema,
   GetSessionResponseSchema,
   CreateSessionPayloadSchema,

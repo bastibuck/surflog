@@ -10,9 +10,7 @@ const BEST_SESSION = {
   name: "Best session",
   date: "2026-10-12",
   rating: 10,
-  notes: null,
   spot: "Kloster",
-  sail: "Gaastra 9",
 };
 
 const fakeSessionsStatsRepository = {
