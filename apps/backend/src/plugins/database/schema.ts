@@ -9,12 +9,14 @@ import {
   sessionsTableConstraints,
 } from "../../modules/sessions/models/Session.model.ts";
 import { spotsTable } from "../../modules/spots/models/Spot.model.ts";
+import { sessionSharesTable } from "../../modules/sharing/models/SessionShare.model.ts";
 
 const schema = {
   spots: spotsTable,
   sessions: sessionsTable,
   sails: sailsTable,
   brands: brandsTable,
+  sessionShares: sessionSharesTable,
 };
 
 const relations = defineRelations(schema, (relationBuilder) => ({
@@ -29,6 +31,12 @@ const relations = defineRelations(schema, (relationBuilder) => ({
       from: relationBuilder.sessions.spotId,
       to: relationBuilder.spots.id,
       optional: false,
+    }),
+
+    share: relationBuilder.one.sessionShares({
+      from: relationBuilder.sessions.id,
+      to: relationBuilder.sessionShares.sessionId,
+      optional: true,
     }),
   },
 
@@ -47,6 +55,14 @@ const relations = defineRelations(schema, (relationBuilder) => ({
 
   brands: {
     sails: relationBuilder.many.sails(),
+  },
+
+  sessionShares: {
+    session: relationBuilder.one.sessions({
+      from: relationBuilder.sessionShares.sessionId,
+      to: relationBuilder.sessions.id,
+      optional: false,
+    }),
   },
 }));
 

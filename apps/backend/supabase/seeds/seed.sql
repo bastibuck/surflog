@@ -23,3 +23,8 @@ insert into public.sessions
 values
     ('422d4bd6-0494-4430-8d4f-ce905e24de3a', '50km Fun', '2026-10-05', 9, null, '08a91ec5-d5ee-42c3-8729-3a19771084d4', 'fca4f095-2569-4319-b43a-4ca8d97d120d'),
     ('09410713-bdaf-4cc6-b4f3-3ac67a4735bd', 'Supi Session', '2026-10-09', 10, 'A bunch of toeside', '668a6acc-b6fd-406d-8a61-74f4a98b4eab', 'fca4f095-2569-4319-b43a-4ca8d97d120d');
+
+insert into public.session_shares
+    (session_id)
+values
+    ('422d4bd6-0494-4430-8d4f-ce905e24de3a');
