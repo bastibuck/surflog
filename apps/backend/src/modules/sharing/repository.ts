@@ -26,9 +26,7 @@ const createSessionSharesRepository = (db: FastifyInstance["db"]) => {
             },
           });
 
-        return {
-          shareLink: `https://surflog.app/sharing/session/${result.id}`, // TODO! get this from config/env
-        };
+        return result.id;
       }),
 
     delete: (sessionId: string) =>

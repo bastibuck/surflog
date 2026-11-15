@@ -27,7 +27,14 @@ const sessionSharesRoutes: FastifyPluginAsyncZod = async (fastify) => {
         return reply.internalServerError("Failed to create session share link");
       }
 
-      return reply.status(201).send(result.data);
+      const shareLink = new URL(
+        `/sharing/sessions/${result.data}`,
+        fastify.env.FRONTEND_URL,
+      );
+
+      return reply.status(201).send({
+        shareLink: shareLink.toString(),
+      });
     },
   );
 

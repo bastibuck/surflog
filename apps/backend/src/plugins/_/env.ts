@@ -5,6 +5,7 @@ import z from "zod";
 const EnvSchema = z.object({
   DATABASE_URL: z.string(),
   DATABASE_SSL: z.enum(["require", "disable"]).default("require"),
+  FRONTEND_URL: z.string(), // TODO! check for URL - ajv fails on "unknown uri"
 });
 
 declare module "fastify" {
