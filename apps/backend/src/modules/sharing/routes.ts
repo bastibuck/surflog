@@ -1,5 +1,8 @@
 import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
-import { CreateSessionShareResponseSchema } from "@surflog/shared/api-schema/sharing/SessionShareSchema";
+import {
+  CreateSessionShareResponseSchema,
+  GetSharedSessionResponseSchema,
+} from "@surflog/shared/api-schema/sharing/SessionShareSchema";
 import { z } from "zod";
 
 const sessionSharesRoutes: FastifyPluginAsyncZod = async (fastify) => {
@@ -61,6 +64,52 @@ const sessionSharesRoutes: FastifyPluginAsyncZod = async (fastify) => {
       }
 
       return reply.status(204).send();
+    },
+  );
+
+  fastify.get(
+    "/sessions/:shareId",
+    {
+      schema: {
+        tags: ["sharing"],
+        params: z.object({
+          shareId: z.uuid(),
+        }),
+        response: {
+          200: GetSharedSessionResponseSchema.describe(
+            "Shared session response",
+          ),
+        },
+      },
+    },
+    async function (request, reply) {
+      const result = await fastify.sessionSharesRepository.viewSharedSession(
+        request.params.shareId,
+      );
+
+      if (
+        result.success === false &&
+        result.error === "NOT_FOUND__session_shares"
+      ) {
+        return reply.notFound("Session share link not found or expired");
+      }
+
+      if (result.success === false) {
+        return reply.internalServerError("Failed to view shared session");
+      }
+
+      if (
+        result.data.success === false &&
+        result.data.error === "NOT_FOUND__sessions"
+      ) {
+        return reply.notFound("Session not found");
+      }
+
+      if (result.data.success === false) {
+        return reply.internalServerError("Failed to view shared session");
+      }
+
+      return reply.status(200).send(result.data.data);
     },
   );
 };
