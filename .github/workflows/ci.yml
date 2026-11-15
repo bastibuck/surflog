@@ -12,6 +12,8 @@ jobs:
     env:
       # fake URL we are not using in tests and only provide for start-up
       DATABASE_URL: postgresql://username:password@localhost:5432/database_name
+      # fake URL we are not using in tests and only provide for start-up
+      FRONTEND_URL: http://localhost:3000
 
     steps:
       - uses: actions/checkout@v7
