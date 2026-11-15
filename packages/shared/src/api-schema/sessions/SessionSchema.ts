@@ -10,6 +10,7 @@ const SessionBaseSchema = z.object({
   sail: z.string(),
   shareTokenPreview: z
     .string()
+    .regex(/^[0-9a-f]{4}\.\.\.[0-9a-f]{4}$/)
     .length(11)
     .nullable()
     .describe("Share token preview if available and not expired"),

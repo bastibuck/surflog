@@ -43,9 +43,7 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
                 left(${sessionSharesTable.id}::text, 4)
                 || '...'
                 || right(${sessionSharesTable.id}::text, 4)
-                `
-                .mapWith(String)
-                .as("token_preview"),
+                `.as("token_preview"),
             })
             .from(sessionSharesTable)
             .where(gt(sessionSharesTable.expiresAt, sql`now()`)),

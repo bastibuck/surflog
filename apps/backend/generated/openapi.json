@@ -456,7 +456,8 @@
                         {
                           "type": "string",
                           "minLength": 11,
-                          "maxLength": 11
+                          "maxLength": 11,
+                          "pattern": "^[0-9a-f]{4}\\.\\.\\.[0-9a-f]{4}$"
                         },
                         {
                           "type": "null"
