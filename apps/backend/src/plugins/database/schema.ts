@@ -16,7 +16,7 @@ const schema = {
   sessions: sessionsTable,
   sails: sailsTable,
   brands: brandsTable,
-  sessionShares: sessionSharesTable,
+  session_shares: sessionSharesTable,
 };
 
 const relations = defineRelations(schema, (relationBuilder) => ({
@@ -33,9 +33,9 @@ const relations = defineRelations(schema, (relationBuilder) => ({
       optional: false,
     }),
 
-    share: relationBuilder.one.sessionShares({
+    share: relationBuilder.one.session_shares({
       from: relationBuilder.sessions.id,
-      to: relationBuilder.sessionShares.sessionId,
+      to: relationBuilder.session_shares.sessionId,
       optional: true,
     }),
   },
@@ -59,7 +59,7 @@ const relations = defineRelations(schema, (relationBuilder) => ({
 
   sessionShares: {
     session: relationBuilder.one.sessions({
-      from: relationBuilder.sessionShares.sessionId,
+      from: relationBuilder.session_shares.sessionId,
       to: relationBuilder.sessions.id,
       optional: false,
     }),

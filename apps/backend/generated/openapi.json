@@ -506,6 +506,72 @@
         }
       }
     },
+    "/sharing/sessions/{sessionId}/create": {
+      "post": {
+        "tags": [
+          "sharing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Session share link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shareLink": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "required": [
+                    "shareLink"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Session share link created"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sharing/sessions/{sessionId}/revoke": {
+      "delete": {
+        "tags": [
+          "sharing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Session share link revoked"
+          }
+        }
+      }
+    },
     "/spots/": {
       "get": {
         "tags": [
