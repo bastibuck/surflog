@@ -9,6 +9,7 @@ import { sailsTable } from "../../../src/modules/gear/models/Sail.model.ts";
 import { sessionsTable } from "../../../src/modules/sessions/models/Session.model.ts";
 import { spotsTable } from "../../../src/modules/spots/models/Spot.model.ts";
 import { createSessionsRepository } from "../../../src/modules/sessions/repository.ts";
+import { sessionSharesTable } from "../../../src/modules/sharing/models/SessionShare.model.ts";
 
 const BRANDS = [
   { id: "62e976d2-56df-4a23-983f-121b1344d233", name: "Gaastra" },
@@ -134,6 +135,7 @@ describe("Module: sessions", () => {
       assert.strictEqual(session.data.rating, 10);
       assert.deepEqual(session.data.spot, SPOTS[0].name);
       assert.deepEqual(session.data.sail, "Duotone 9");
+      assert.strictEqual(session.data.shareTokenPreview, null);
     });
 
     test("should return an error if session does not exist", async () => {
@@ -147,6 +149,61 @@ describe("Module: sessions", () => {
 
       assert.strictEqual(session.success, false);
       assert.strictEqual(session.error, "NOT_FOUND__sessions");
+    });
+
+    test("should return a shareTokenPreview if exists and not expired", async () => {
+      const testDb = getTestDb();
+
+      await testDb.insert(sessionsTable).values({
+        id: "9d411ee6-8c08-45b8-9e42-b29c2723980a",
+        date: "2026-10-12",
+        spotId: SPOTS[0].id,
+        sailId: SAILS[0].id,
+        name: "Super session 1",
+        rating: 10,
+      });
+
+      await testDb.insert(sessionSharesTable).values({
+        id: "5e28a5e9-1ee2-4cbd-ad61-9c9827680adf",
+        sessionId: "9d411ee6-8c08-45b8-9e42-b29c2723980a",
+      });
+
+      const repo = createSessionsRepository(testDb);
+
+      const session = await repo.findById(
+        "9d411ee6-8c08-45b8-9e42-b29c2723980a",
+      );
+
+      assert.strictEqual(session.success, true);
+      assert.strictEqual(session.data.shareTokenPreview, "5e28...0adf");
+    });
+
+    test("should not return a shareTokenPreview if exists but expired", async () => {
+      const testDb = getTestDb();
+
+      await testDb.insert(sessionsTable).values({
+        id: "9d411ee6-8c08-45b8-9e42-b29c2723980a",
+        date: "2026-10-12",
+        spotId: SPOTS[0].id,
+        sailId: SAILS[0].id,
+        name: "Super session 1",
+        rating: 10,
+      });
+
+      await testDb.insert(sessionSharesTable).values({
+        id: "5e28a5e9-1ee2-4cbd-ad61-9c9827680adf",
+        sessionId: "9d411ee6-8c08-45b8-9e42-b29c2723980a",
+        expiresAt: new Date(Date.now() - 1000), // expired
+      });
+
+      const repo = createSessionsRepository(testDb);
+
+      const session = await repo.findById(
+        "9d411ee6-8c08-45b8-9e42-b29c2723980a",
+      );
+
+      assert.strictEqual(session.success, true);
+      assert.strictEqual(session.data.shareTokenPreview, null);
     });
 
     test("should create a session correctly", async () => {

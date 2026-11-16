@@ -14,6 +14,7 @@ import type {} from "./plugins/sensible.ts";
 import envPlugin from "./plugins/_/env.ts";
 import docsPlugin from "./plugins/_/docs.ts";
 import type { SessionsPluginOptions } from "./modules/sessions/index.ts";
+import type { SharingPluginOptions } from "./modules/sharing/index.ts";
 import type { GearPluginOptions } from "./modules/gear/index.ts";
 import type { SpotsPluginOptions } from "./modules/spots/index.ts";
 import type { SailsStatsPluginOptions } from "./modules/stats/sails/index.ts";
@@ -24,6 +25,7 @@ export interface AppOptions
   extends
     FastifyServerOptions,
     Partial<AutoloadPluginOptions>,
+    SharingPluginOptions,
     SessionsPluginOptions,
     GearPluginOptions,
     SpotsPluginOptions,

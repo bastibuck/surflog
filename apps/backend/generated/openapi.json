@@ -450,6 +450,20 @@
                     },
                     "sail": {
                       "type": "string"
+                    },
+                    "shareTokenPreview": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 11,
+                          "maxLength": 11,
+                          "pattern": "^[0-9a-f]{4}\\.\\.\\.[0-9a-f]{4}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Share token preview if available and not expired"
                     }
                   },
                   "required": [
@@ -459,7 +473,8 @@
                     "rating",
                     "notes",
                     "spot",
-                    "sail"
+                    "sail",
+                    "shareTokenPreview"
                   ],
                   "additionalProperties": false,
                   "description": "Session details"
@@ -488,6 +503,155 @@
         "responses": {
           "204": {
             "description": "Session deleted"
+          }
+        }
+      }
+    },
+    "/sharing/sessions/{sessionId}/create": {
+      "post": {
+        "tags": [
+          "sharing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Session share link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shareLink": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "required": [
+                    "shareLink"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Session share link created"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sharing/sessions/{sessionId}/revoke": {
+      "delete": {
+        "tags": [
+          "sharing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Session share link revoked"
+          }
+        }
+      }
+    },
+    "/sharing/sessions/{shareId}": {
+      "get": {
+        "tags": [
+          "sharing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "shareId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shared session response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    },
+                    "rating": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10
+                    },
+                    "notes": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 500
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "spot": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "sail": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "date",
+                    "rating",
+                    "notes",
+                    "spot",
+                    "sail"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Shared session response"
+                }
+              }
+            }
           }
         }
       }
@@ -824,24 +988,10 @@
                           "minimum": 1,
                           "maximum": 10
                         },
-                        "notes": {
-                          "anyOf": [
-                            {
-                              "type": "string",
-                              "maxLength": 500
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
                         "spot": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 50
-                        },
-                        "sail": {
-                          "type": "string"
                         }
                       },
                       "required": [
@@ -849,9 +999,7 @@
                         "name",
                         "date",
                         "rating",
-                        "notes",
-                        "spot",
-                        "sail"
+                        "spot"
                       ],
                       "additionalProperties": false
                     },

@@ -15,6 +15,7 @@ const fakeSessionsRepository = {
       notes: null,
       spot: "Spot Name",
       sail: "Some Brand 5 | Sail Alias",
+      shareTokenPreview: null,
     }),
   create: async (_session) =>
     success({ id: "7561179f-9760-4ac2-838b-67ee08225a13" }),
@@ -121,6 +122,7 @@ describe("Module: sessions", () => {
           notes: null,
           spot: "Spot Name",
           sail: "Some Brand 5 | Sail Alias",
+          shareTokenPreview: null,
         });
       });
 

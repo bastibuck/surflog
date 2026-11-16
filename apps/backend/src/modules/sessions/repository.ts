@@ -1,15 +1,21 @@
-import { eq } from "drizzle-orm/pg-core/expressions";
 import type { FastifyInstance } from "fastify";
 
 import type { CreateSessionPayload } from "@surflog/shared/api-schema/sessions/SessionSchema";
+import {
+  eq,
+  gt,
+  sql,
+  type InferInsertModel,
+  type InferSelectModel,
+} from "drizzle-orm";
 import { EntityNotFoundError, withDatabaseResult } from "../../lib/database.ts";
 import type { Repository } from "../../lib/types/Repository.ts";
 import { brandsTable } from "../gear/models/Brand.model.ts";
 import { sailsTable } from "../gear/models/Sail.model.ts";
+import { sailsDisplayNameSql } from "../gear/utils/sails.utils.ts";
+import { sessionSharesTable } from "../sharing/models/SessionShare.model.ts";
 import { spotsTable } from "../spots/models/Spot.model.ts";
 import { sessionsTable } from "./models/Session.model.ts";
-import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { sailsDisplayNameSql } from "../gear/utils/sails.utils.ts";
 
 const createSessionsRepository = (db: FastifyInstance["db"]) => {
   return {
@@ -29,7 +35,22 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
 
     findById: (id: string) =>
       withDatabaseResult(async () => {
+        const activeShare = db.$with("active_share").as(
+          db
+            .select({
+              sessionId: sessionSharesTable.sessionId,
+              tokenPreview: sql<string | null>`
+                left(${sessionSharesTable.id}::text, 4)
+                || '...'
+                || right(${sessionSharesTable.id}::text, 4)
+                `.as("token_preview"),
+            })
+            .from(sessionSharesTable)
+            .where(gt(sessionSharesTable.expiresAt, sql`now()`)),
+        );
+
         const [session] = await db
+          .with(activeShare)
           .select({
             id: sessionsTable.id,
             name: sessionsTable.name,
@@ -38,12 +59,14 @@ const createSessionsRepository = (db: FastifyInstance["db"]) => {
             notes: sessionsTable.notes,
             spot: spotsTable.name,
             sail: sailsDisplayNameSql,
+            shareTokenPreview: activeShare.tokenPreview,
           })
           .from(sessionsTable)
           .where(eq(sessionsTable.id, id))
           .innerJoin(spotsTable, eq(sessionsTable.spotId, spotsTable.id))
           .innerJoin(sailsTable, eq(sessionsTable.sailId, sailsTable.id))
           .innerJoin(brandsTable, eq(sailsTable.brandId, brandsTable.id))
+          .leftJoin(activeShare, eq(sessionsTable.id, activeShare.sessionId))
           .limit(1);
 
         if (session === undefined) {

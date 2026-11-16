@@ -137,7 +137,13 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, reply) {
-      await fastify.sessionsRepository.delete(request.params.sessionId);
+      const result = await fastify.sessionsRepository.delete(
+        request.params.sessionId,
+      );
+
+      if (result.success === false) {
+        return reply.internalServerError("Failed to delete session");
+      }
 
       return reply.status(204).send();
     },

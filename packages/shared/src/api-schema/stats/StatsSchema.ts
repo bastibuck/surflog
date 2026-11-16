@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GetSessionResponseSchema } from "../sessions/SessionSchema.ts";
+import { SessionBaseSchema } from "../sessions/SessionSchema.ts";
 
 // generic
 const DateFilterSchema = z
@@ -87,7 +87,13 @@ const GetSessionsAverageRatingResponseSchema = z
   .nullable();
 
 const GetBestSessionFilterSchema = DateFilterSchema;
-const GetBestSessionResponseSchema = GetSessionResponseSchema.nullable();
+const GetBestSessionResponseSchema = SessionBaseSchema.pick({
+  id: true,
+  name: true,
+  date: true,
+  rating: true,
+  spot: true,
+}).nullable();
 
 const GetDaysSinceLastSessionResponseSchema = z
   .number()
@@ -96,20 +102,20 @@ const GetDaysSinceLastSessionResponseSchema = z
   .nullable();
 
 export {
-  GetMostUsedSailsResponseSchema,
-  GetMostUsedSailsFiltersSchema,
-  GetBestSailsResponseSchema,
-  GetBestSailsFiltersSchema,
-  GetMostVisitedSpotsResponseSchema,
-  GetMostVisitedSpotsFiltersSchema,
-  GetBestSpotsResponseSchema,
-  GetBestSpotsFiltersSchema,
   GetAverageSpotRatingResponseSchema,
-  GetSessionsCountFilterSchema,
-  GetSessionsCountResponseSchema,
-  GetSessionsAverageRatingFilterSchema,
-  GetSessionsAverageRatingResponseSchema,
+  GetBestSailsFiltersSchema,
+  GetBestSailsResponseSchema,
   GetBestSessionFilterSchema,
   GetBestSessionResponseSchema,
+  GetBestSpotsFiltersSchema,
+  GetBestSpotsResponseSchema,
   GetDaysSinceLastSessionResponseSchema,
+  GetMostUsedSailsFiltersSchema,
+  GetMostUsedSailsResponseSchema,
+  GetMostVisitedSpotsFiltersSchema,
+  GetMostVisitedSpotsResponseSchema,
+  GetSessionsAverageRatingFilterSchema,
+  GetSessionsAverageRatingResponseSchema,
+  GetSessionsCountFilterSchema,
+  GetSessionsCountResponseSchema,
 };
