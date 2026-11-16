@@ -91,7 +91,7 @@ const sessionSharesRoutes: FastifyPluginAsyncZod = async (fastify) => {
         result.success === false &&
         result.error === "NOT_FOUND__session_shares"
       ) {
-        return reply.notFound("Session share link not found or expired");
+        return reply.notFound("Session not found or expired");
       }
 
       if (result.success === false) {
@@ -102,7 +102,7 @@ const sessionSharesRoutes: FastifyPluginAsyncZod = async (fastify) => {
         result.data.success === false &&
         result.data.error === "NOT_FOUND__sessions"
       ) {
-        return reply.notFound("Session not found");
+        return reply.notFound("Session not found or expired");
       }
 
       if (result.data.success === false) {
