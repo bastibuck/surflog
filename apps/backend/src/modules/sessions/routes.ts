@@ -64,7 +64,18 @@ const sessionsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         tags: ["sessions"],
-        body: CreateSessionPayloadSchema,
+        body: CreateSessionPayloadSchema.refine(
+          (data) => {
+            const today = new Date();
+            const date = new Date(data.date);
+
+            return date <= today;
+          },
+          {
+            error: "Session date cannot be in the future",
+            path: ["date"],
+          },
+        ),
         response: {
           201: CreateSessionResponseSchema.describe("Session created"),
         },

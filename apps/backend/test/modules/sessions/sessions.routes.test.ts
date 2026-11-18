@@ -633,6 +633,42 @@ describe("Module: sessions", () => {
             );
           }
         });
+
+        test("validates date for not being in the future", async (t) => {
+          const app = await build(t, {
+            sessionsRepository: fakeSessionsRepository,
+          });
+
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowString = tomorrow.toISOString().split("T")[0];
+
+          const res = await app.inject({
+            method: "POST",
+            url: "/sessions",
+            payload: {
+              name: "Some session",
+              date: tomorrowString,
+              rating: 5,
+              notes: null,
+              spot: {
+                action: "reference",
+                id: "e237d317-f452-422e-bf92-aebcdf375cca",
+              },
+              sail: {
+                action: "reference",
+                id: "abd9a487-8f93-4fc0-90f3-f4f7eb266c08",
+              },
+            },
+          });
+
+          assert.equal(res.statusCode, 400);
+          assert.equal(JSON.parse(res.payload).error, "Bad Request");
+          assert.equal(
+            JSON.parse(res.payload).details.issues[0].message,
+            "Session date cannot be in the future",
+          );
+        });
       });
     });
 
